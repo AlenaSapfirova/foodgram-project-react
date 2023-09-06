@@ -59,7 +59,7 @@ class CustomUserViewSet(UserViewSet):
                 raise exceptions.ValidationError('подписка уже оформлена')
             else:
                 Subscription.objects.create(user=user, author=author)
-                serializer = self.get_serializer(subscribe)
+                serializer = self.get_serializer(author)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
 
@@ -113,8 +113,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             Favorite.objects.create(recipes=recipe, user=user)
             serializer = self.get_serializer(ShortViewRecipesSerializers(
                 recipe, context={'request': request}
-                )
-            )
+            ))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
@@ -130,7 +129,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
         if request.method == "POST":
-            if Shopping_Cart.objects.filter(user=user, recipes=recipe).exists():
+            if Shopping_Cart.objects.filter(user=user,
+                                            recipes=recipe).exists():
                 raise ValueError(
                     'Такой рецепт уже добавлен в Ваш список покупок.'
                 )
@@ -156,20 +156,20 @@ class RecipesViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         shopping_dict = Recipes.objects.filter(
             recipes_shopping_cart_recipes__user=user
-        ).values('ingredients__name', 'ingredients__measurement_unit',
-                 'ingredients__ingredient__amount').order_by(
-                     'ingredients__name'
-                )
-        data =[]
+        ).values(
+            'ingredients__name', 'ingredients__measurement_unit',
+            'ingredients__ingredient__amount'
+        ).order_by('ingredients__name')
+        data = []
         shopping_list = []
         for val in shopping_dict:
             key = (f'{val["ingredients__name"]}'
                    f'({val["ingredients__measurement_unit"]})'
                    f':{ val["ingredients__ingredient__amount"]}')
-            data.append(key) 
+            data.append(key)
         for i in data:
             shopping_list.append(f'{i} \n')
-        '\n'.join(shopping_list)    
+        '\n'.join(shopping_list)
         response = HttpResponse(shopping_list, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename=shopping_list.txt'
         return response

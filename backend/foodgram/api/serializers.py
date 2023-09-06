@@ -112,7 +112,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         if limit:
             recipes = recipes[:int(limit)]
         return ShortViewRecipesSerializers(recipes, many=True).data
-    
+
     def get_recipes_count(self, obj):
         return obj.author.author.count()
 
