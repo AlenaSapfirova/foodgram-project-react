@@ -1,25 +1,20 @@
-from rest_framework import viewsets, status, exceptions
-from django.db.models import Sum
+from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from djoser.views import UserViewSet
+from rest_framework import exceptions, status, viewsets
+from rest_framework import filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from djoser.views import UserViewSet
-from django.shortcuts import get_object_or_404
-from rest_framework.permissions import (
-    IsAuthenticated,
-)
+from rest_framework.permissions import IsAuthenticated
+
 from .pagination import CustomPaginator
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
 from recipes.models import (
     Tag,
     Recipes,
     Ingredient,
     Shopping_Cart,
-    Favorite,
-    Amount
-
-
+    Favorite
 )
 from .serializers import (
     CustomUserSerializer,

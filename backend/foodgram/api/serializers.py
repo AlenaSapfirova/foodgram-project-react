@@ -52,13 +52,12 @@ class CreateUserSerializer(UserCreateSerializer):
 
 class CustomUserSerializer(UserCreateSerializer):
     is_subscribed = serializers.SerializerMethodField()
-    username = serializers.CharField(max_length=100,
-                                     required=False,
-                                     validators=[
-                                         RegexValidator(regex=r'^[\w.@+-]+\Z'),
-                                         UniqueValidator(
-                                             queryset=User.objects.all()
-                                        )])
+    username = serializers.CharField(
+        max_length=100,
+        required=False,
+        validators=[RegexValidator(regex=r'^[\w.@+-]+\Z'),
+                    UniqueValidator(queryset=User.objects.all())]
+    )
     first_name = serializers.CharField(max_length=150, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     email = serializers.EmailField(max_length=254)
@@ -105,7 +104,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                   'recipes_count',
                   'is_subscribed',
                   'id',)
-        
+
     def get_recipes(self, obj):
         recipes = Recipes.objects.filter(author=obj)
         request = self.context['request']
@@ -145,7 +144,7 @@ class GetRecipesSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True,
         slug_field='slug'
-     )
+    )
     ingredients = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
@@ -171,7 +170,7 @@ class AmountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Amount
-        fields = ('id', 'amount', 'name', 'measurement_unit') 
+        fields = ('id', 'amount', 'name', 'measurement_unit')
 
 
 class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
@@ -199,14 +198,14 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
         for field in ('image', 'name', 'text', 'cooking_time'):
             if field is None in data:
                 raise serializers.ValidationError('Поле не может быть пустым')
-        return data   
+        return data
 
     def validated_ingredients(self, value):
         if value is None:
             raise serializers.ValidationError(
                 'В рецепте должен быть хоть один ингредиент'
             )
-        ingredient_list =[]
+        ingredient_list = []
         for ingredient in value:
             ingredient_list.append(ingredient)
             if ingredient_list.count(ingredient) > 1:
@@ -214,7 +213,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                     'В рецепте не может быть одинаковых ингредиентов'
                 )
         return value
-    
+
     def validate_tags(self, value):
         if value is None:
             raise serializers.ValidationError(
@@ -253,7 +252,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
         self.create_ingredients_amount(recipe=recipe,
                                        ingredients=ingredients)
         return recipe
-    
+
     def to_representation(self, instance):
         return GetRecipesSerializer(
             instance, context={'request': self.context.get('request')}).data
