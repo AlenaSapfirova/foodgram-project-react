@@ -1,13 +1,12 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+
 from .models import (
     Amount,
     Tag,
     Recipes,
     Ingredient,
     Favorite,
-    Shopping_Cart,
-    User
+    Shopping_Cart
 )
 from users.models import Subscription
 

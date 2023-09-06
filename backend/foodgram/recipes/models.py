@@ -111,10 +111,8 @@ class Recipes(models.Model):
 class Amount(models.Model):
     amount = models.SmallIntegerField(
         default=1,
-        validators=[
-           MinValueValidator(1),
-           MaxValueValidator(1000)
-       ]
+        validators=[MinValueValidator(1),
+                    MaxValueValidator(1000)]
     )
     ingredient = models.ForeignKey(
         Ingredient,
@@ -164,4 +162,3 @@ class Favorite(FavoriteBase):
                                     name='unique_user_favorite_recipe')
 
         ]
-   
