@@ -27,4 +27,3 @@ class CustomFilters(filters.FilterSet):
     class Meta:
         model = Recipes
         fields = ['tags', 'author']
-

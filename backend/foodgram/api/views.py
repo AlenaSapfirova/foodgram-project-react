@@ -171,5 +171,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             shopping_list.append(f'{i} \n')
         '\n'.join(shopping_list)
         response = HttpResponse(shopping_list, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename=shopping_list.txt'
+        response['Content-Disposition'] = (
+            'attachment; filename={0}'.format('shopping_list.txt')
+        )
         return response
