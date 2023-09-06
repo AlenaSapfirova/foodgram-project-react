@@ -2,11 +2,9 @@ import base64
 import webcolors
 from rest_framework import serializers
 from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
+
 from django.core.validators import (
-    RegexValidator,
-    MaxValueValidator,
-    MinValueValidator
+    RegexValidator
 )
 from rest_framework.validators import UniqueValidator
 from djoser.serializers import UserCreateSerializer
@@ -60,9 +58,7 @@ class CustomUserSerializer(UserCreateSerializer):
                                          RegexValidator(regex=r'^[\w.@+-]+\Z'),
                                          UniqueValidator(
                                              queryset=User.objects.all()
-                                        )
-                                    ]
-                                )
+                                        )])
     first_name = serializers.CharField(max_length=150, required=False)
     last_name = serializers.CharField(max_length=150, required=False)
     email = serializers.EmailField(max_length=254)
@@ -227,7 +223,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
         tags_list = []
         for tag in value:
             tags_list.append(tag)
-            if tags_list.count(tag)>1:
+            if tags_list.count(tag) > 1:
                 raise serializers.ValidationError(
                     'В рецепте не может быть одинаковых тэгов'
                 )
