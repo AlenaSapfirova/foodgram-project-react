@@ -10,17 +10,21 @@ class CustomFilters(filters.FilterSet):
                                              queryset=Tag.objects.all())
     author = filters.ModelChoiceFilter(User.objects.all())
     is_favorited = filters.BooleanFilter(field_name='is_favorited',
-                                         method='filter_params')
+                                         method='filter_params_favorite')
     is_in_shopping_cart = filters.BooleanFilter(
         field_name='is_in_shopping_cart',
-        method='filter_params'
+        method='filter_params_shopping'
     )
 
-    def filter_params(self, name, queryset, value):
+    def filter_params_favorite(self, name, queryset, value):
         if self.request.user.is_anonymous:
             return queryset
         if name == 'is_favorited' and value:
             return queryset.filter(favorite__user=self.request.user)
+
+    def filter_params_shopping(self, name, queryset, value):
+        if self.request.user.is_anonymous:
+            return queryset
         if name == 'is_in_shopping_cart' and value:
             return queryset.filter(shopping_cart__user=self.request.user)
 

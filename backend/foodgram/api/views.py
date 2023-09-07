@@ -25,7 +25,7 @@ from .serializers import (
     CreateUpdateRecipesSerializer,
     ShortViewRecipesSerializers
 )
-from .permissions import AuthorOrReadOnly
+from .permissions import AuthorOnly, AuthorOrReadOnly
 
 from users.models import User, Subscription
 from .filters import CustomFilters
@@ -36,7 +36,7 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = CustomPaginator
 
-    @action(detail=False, permission_classes=[IsAuthenticated, ],
+    @action(detail=False, permission_classes=[AuthorOnly, ],
             serializer_class=SubscriptionSerializer, methods=['get'])
     def subscriptions(self, request):
         query = User.objects.get(id=request.user.id)
@@ -50,7 +50,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(serializer_class=SubscriptionSerializer,
             methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated, ], detail=True)
+            permission_classes=[AuthorOnly, ], detail=True)
     def subscribe(self, request, id):
         if request.method == "POST":
             user = request.user
@@ -115,13 +115,10 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 recipe, context={'request': request}
             ))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        if request.method == 'DELETE':
-            if not Favorite.objects.filter(recipes=recipe, user=user).exists():
-                raise ValueError('Рецепт остутствует.')
-            Favorite.objects.filter(recipe=recipe, user=user).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        if not Favorite.objects.filter(recipes=recipe, user=user).exists():
+            raise ValueError('Рецепт остутствует.')
+        Favorite.objects.filter(recipes=recipe, user=user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, serializer_class=ShortViewRecipesSerializers,
             methods=['post', 'delete'], permission_classes=[IsAuthenticated])
@@ -139,13 +136,11 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 recipes=recipe, context={'request': request}
             ))
             return Response(serializer.data, stats=status.HTTP_201_CREATED)
-        if request.method == "DELETE":
-            if not Shopping_Cart.objects.filter(user=user,
-                                                recipes=recipe).exists():
-                raise ValueError('Такого рецепта нет.')
-            Shopping_Cart.objects.filter(recipe=recipe, user=user).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        if not Shopping_Cart.objects.filter(user=user,
+                                            recipes=recipe).exists():
+            raise ValueError('Такого рецепта нет.')
+        Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, serializer_class=ShortViewRecipesSerializers,
             permission_classes=[IsAuthenticated, ])
@@ -158,20 +153,20 @@ class RecipesViewSet(viewsets.ModelViewSet):
             recipes_shopping_cart_recipes__user=user
         ).values(
             'ingredients__name', 'ingredients__measurement_unit',
-            'ingredients__ingredient__amount'
+            'ingredients__ingredient__amount',
         ).order_by('ingredients__name')
-        data = []
+        data = {}
         shopping_list = []
         for val in shopping_dict:
             key = (f'{val["ingredients__name"]}'
-                   f'({val["ingredients__measurement_unit"]})'
-                   f':{ val["ingredients__ingredient__amount"]}')
-            data.append(key)
-        for i in data:
-            shopping_list.append(f'{i} \n')
-        '\n'.join(shopping_list)
+                   f'({val["ingredients__measurement_unit"]})')
+            data[key] = data.get(key, 0) + int(
+                val['ingredients__ingredient__amount']
+            )
+        for key, val in data.items():
+            shopping_list.append(f'{key}:{val} \n')
         response = HttpResponse(shopping_list, content_type='text/plain')
         response['Content-Disposition'] = (
-            'attachment; filename={0}'.format('shopping_list.txt')
+            'attachment; filename= {0}'.format('shopping_list.txt')
         )
         return response

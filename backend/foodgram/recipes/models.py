@@ -15,18 +15,20 @@ class Tag(models.Model):
         blank=False,
     )
     color = models.CharField(
-        max_length=16,
+        max_length=7,
         unique=True,
-        blank=False
+        blank=False,
+        validators=[
+            RegexValidator(regex=r'#(?:[0-9a-fA-F]{3}){1,2}$')
+        ]
     )
     slug = models.SlugField(
         null=True,
         unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$')],
     )
 
     class Meta:
-        ordering = ('id',)
+        ordering = ('slug',)
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
 
@@ -70,7 +72,7 @@ class Recipes(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='author',
+        related_name='recipes',
         blank=False,
         verbose_name='Автор'
     )
@@ -148,8 +150,8 @@ class Shopping_Cart(FavoriteBase):
         db_table = 'Shopping_Cart'
         verbose_name = 'Список покупок'
         constraints = [
-            models.UniqueConstraint(fields=['user', 'recipe'],
-                                    name='unique_user_shopping_cart_recipe')
+            models.UniqueConstraint(fields=['user', 'recipes'],
+                                    name='unique_user_shopping_cart_recipes')
         ]
 
 
@@ -158,7 +160,7 @@ class Favorite(FavoriteBase):
         db_table = 'Favorite'
         verbose_name = 'Избранное'
         constraints = [
-            models.UniqueConstraint(fields=['user', 'recipe'],
-                                    name='unique_user_favorite_recipe')
+            models.UniqueConstraint(fields=['user', 'recipes'],
+                                    name='unique_user_favorite_recipes')
 
         ]

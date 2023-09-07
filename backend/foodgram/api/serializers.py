@@ -1,13 +1,12 @@
+from django.core.files.base import ContentFile
+from django.core.validators import RegexValidator
+from djoser.serializers import UserCreateSerializer
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+
 import base64
 import webcolors
-from rest_framework import serializers
-from django.core.files.base import ContentFile
 
-from django.core.validators import (
-    RegexValidator
-)
-from rest_framework.validators import UniqueValidator
-from djoser.serializers import UserCreateSerializer
 from recipes.models import (
     Amount,
     Tag,
@@ -124,11 +123,15 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
-    color = Hex2NameColor()
 
     class Meta:
         model = Tag
         fields = ('name', 'color', 'slug')
+
+    def validate_color(self, value):
+        if value == webcolors.hex_to_name(value):
+            raise serializers.ValidationError('У такого цвета нет имени')
+        return value
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -162,7 +165,7 @@ class GetRecipesSerializer(serializers.ModelSerializer):
 class AmountSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(source='ingredient.id',
                                             queryset=Ingredient.objects.all())
-    name = serializers.ReadOnlyField(source='ingredient.name')
+    name = serializers.StringRelatedField(read_only=True)
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
     )
@@ -175,7 +178,7 @@ class AmountSerializer(serializers.ModelSerializer):
 
 class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
-    image = Base64ImageField(required=False, allow_null=True)
+    image = Base64ImageField(required=True, allow_null=True)
     tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     ingredients = AmountSerializer(many=True)
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -194,13 +197,20 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                   'text',
                   'cooking_time')
 
+    def validate_image(self, value):
+        if value is None:
+            raise serializers.ValidationError('Картинка должна быть в рецепте')
+        return value
+
     def validated(self, data):
         for field in ('image', 'name', 'text', 'cooking_time'):
             if field is None in data:
-                raise serializers.ValidationError('Поле не может быть пустым')
+                raise serializers.ValidationError(
+                    f'{field} поле не может быть пустым'
+                )
         return data
 
-    def validated_ingredients(self, value):
+    def validate_ingredients(self, value):
         if value is None:
             raise serializers.ValidationError(
                 'В рецепте должен быть хоть один ингредиент'
@@ -258,8 +268,6 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             instance, context={'request': self.context.get('request')}).data
 
     def update(self, instance, validated_data):
-        print(instance)
-        print(validated_data)
         tags = self.initial_data.pop('tags')
         if tags is not None:
             instance.tags.set(tags)
