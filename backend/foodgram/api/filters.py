@@ -19,14 +19,12 @@ class CustomFilters(filters.FilterSet):
     def filter_params_favorite(self, name, queryset, value):
         if self.request.user.is_anonymous:
             return queryset
-        if name == 'is_favorited' and value:
-            return queryset.filter(favorite__user=self.request.user)
+        return queryset.filter(favorite__user=self.request.user)
 
     def filter_params_shopping(self, name, queryset, value):
         if self.request.user.is_anonymous:
             return queryset
-        if name == 'is_in_shopping_cart' and value:
-            return queryset.filter(shopping_cart__user=self.request.user)
+        return queryset.filter(shopping_cart__user=self.request.user)
 
     class Meta:
         model = Recipes

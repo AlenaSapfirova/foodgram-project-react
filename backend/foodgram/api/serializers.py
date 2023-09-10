@@ -128,11 +128,6 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('name', 'color', 'slug')
 
-    def validate_color(self, value):
-        if value == webcolors.hex_to_name(value):
-            raise serializers.ValidationError('У такого цвета нет имени')
-        return value
-
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:

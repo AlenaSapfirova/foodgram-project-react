@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -17,13 +18,13 @@ from recipes.models import (
     Favorite
 )
 from .serializers import (
-    CustomUserSerializer,
-    TagSerializer,
-    IngredientSerializer,
-    SubscriptionSerializer,
-    GetRecipesSerializer,
     CreateUpdateRecipesSerializer,
-    ShortViewRecipesSerializers
+    CustomUserSerializer,
+    GetRecipesSerializer,
+    IngredientSerializer,
+    ShortViewRecipesSerializers,
+    SubscriptionSerializer,
+    TagSerializer
 )
 from .permissions import AuthorOnly, AuthorOrReadOnly
 
@@ -57,18 +58,16 @@ class CustomUserViewSet(UserViewSet):
             author = get_object_or_404(User, id=id)
             if Subscription.objects.filter(user=user, author=author).exists():
                 raise exceptions.ValidationError('подписка уже оформлена')
-            else:
-                Subscription.objects.create(user=user, author=author)
-                serializer = self.get_serializer(author)
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
+            Subscription.objects.create(user=user, author=author)
+            serializer = self.get_serializer(author)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
 
-        if request.method == 'DELETE':
-            author = get_object_or_404(User, id=id)
-            user = request.user
-            subscribe = Subscription.objects.filter(user=user, author=author)
-            subscribe.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        author = get_object_or_404(User, id=id)
+        user = request.user
+        subscribe = Subscription.objects.filter(user=user, author=author)
+        subscribe.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -145,7 +144,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
     @action(detail=False, serializer_class=ShortViewRecipesSerializers,
             permission_classes=[IsAuthenticated, ])
     def download_shopping_cart(self, request):
-        print(self.request)
         user = self.request.user
         if user.is_anonymous:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -154,7 +152,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredients__name', 'ingredients__measurement_unit',
             'ingredients__ingredient__amount',
-        ).order_by('ingredients__name')
+        ).order_by(Sum('ingredients__name'))
         data = {}
         shopping_list = []
         for val in shopping_dict:
