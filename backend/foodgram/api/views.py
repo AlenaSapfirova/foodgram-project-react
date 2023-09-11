@@ -2,6 +2,8 @@ from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+# from django.template import RequestContext
 from djoser.views import UserViewSet
 from rest_framework import exceptions, status, viewsets
 from rest_framework import filters
@@ -152,15 +154,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
         ).values(
             'ingredients__name', 'ingredients__measurement_unit',
             'ingredients__ingredient__amount',
-        ).order_by(Sum('ingredients__name'))
+        ).annotate(ingredient_amount=Sum('ingredients__ingredient__amount'))
         data = {}
         shopping_list = []
         for val in shopping_dict:
+            print(val)
+            amount = val['ingredient_amount']
             key = (f'{val["ingredients__name"]}'
                    f'({val["ingredients__measurement_unit"]})')
-            data[key] = data.get(key, 0) + int(
-                val['ingredients__ingredient__amount']
-            )
+            data[key] = data.get(key, 0) + amount
         for key, val in data.items():
             shopping_list.append(f'{key}:{val} \n')
         response = HttpResponse(shopping_list, content_type='text/plain')
@@ -168,3 +170,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             'attachment; filename= {0}'.format('shopping_list.txt')
         )
         return response
+
+
+def handler404(request, exception):
+    return render(request, 'err/404.html', status=404)

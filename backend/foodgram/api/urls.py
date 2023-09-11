@@ -6,8 +6,11 @@ from .views import (
     IngredientViewSet,
     RecipesViewSet,
     TagViewSet,
-    CustomUserViewSet
+    CustomUserViewSet,
+
 )
+
+handler404 = 'api.views.handler404'
 
 
 router = DefaultRouter()
