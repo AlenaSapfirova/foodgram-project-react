@@ -1,14 +1,12 @@
 from django_filters import rest_framework as filters
 
 from recipes.models import Tag, Recipes
-from users.models import User
 
 
 class CustomFilters(filters.FilterSet):
-    tags = filters.ModelMultipleChoiceFilter(fields_name='tags__slug',
-                                             to_field_name='slug',
+    tags = filters.ModelMultipleChoiceFilter(field_name='tags__slug',
                                              queryset=Tag.objects.all())
-    author = filters.ModelChoiceFilter(User.objects.all())
+    author = filters.NumberFilter(field_name='author')
     is_favorited = filters.BooleanFilter(field_name='is_favorited',
                                          method='filter_params_favorite')
     is_in_shopping_cart = filters.BooleanFilter(

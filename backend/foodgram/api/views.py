@@ -2,8 +2,6 @@ from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
-# from django.template import RequestContext
 from djoser.views import UserViewSet
 from rest_framework import exceptions, status, viewsets
 from rest_framework import filters
@@ -39,14 +37,14 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
     pagination_class = CustomPaginator
 
-    @action(detail=False, permission_classes=[AuthorOnly, ],
+    @action(detail=False,
             serializer_class=SubscriptionSerializer, methods=['get'])
     def subscriptions(self, request):
-        query = User.objects.get(id=request.user.id)
-        queryset = query.user.all()
-        serializer = SubscriptionSerializer(queryset, many=True,
+        user = request.user
+        query = User.objects.filter(subscribe__user=user)
+        serializer = SubscriptionSerializer(query, many=True,
                                             context={'request': request})
-        page = self.paginate_queryset(queryset)
+        page = self.paginate_queryset(query)
         serializer = SubscriptionSerializer(page, many=True,
                                             context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -64,7 +62,6 @@ class CustomUserViewSet(UserViewSet):
             serializer = self.get_serializer(author)
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
-
         author = get_object_or_404(User, id=id)
         user = request.user
         subscribe = Subscription.objects.filter(user=user, author=author)
@@ -91,14 +88,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
     filterset_class = CustomFilters
     permission_classes = (AuthorOrReadOnly,)
 
-    def perform_create(self, serializer):
-        author = self.request.user
-        serializer.save(author=author)
-
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return GetRecipesSerializer
         return CreateUpdateRecipesSerializer
+
+    def perform_create(self, serializer):
+        author = self.request.user
+        serializer.save(author=author)
 
     @action(detail=True, methods=['post', 'delete'],
             serializer_class=ShortViewRecipesSerializers,
@@ -144,7 +141,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, serializer_class=ShortViewRecipesSerializers,
-            permission_classes=[IsAuthenticated, ])
+            permission_classes=[IsAuthenticated, ], methods=['GET'])
     def download_shopping_cart(self, request):
         user = self.request.user
         if user.is_anonymous:
@@ -158,7 +155,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
         data = {}
         shopping_list = []
         for val in shopping_dict:
-            print(val)
             amount = val['ingredient_amount']
             key = (f'{val["ingredients__name"]}'
                    f'({val["ingredients__measurement_unit"]})')
@@ -170,7 +166,3 @@ class RecipesViewSet(viewsets.ModelViewSet):
             'attachment; filename= {0}'.format('shopping_list.txt')
         )
         return response
-
-
-def handler404(request, exception):
-    return render(request, 'err/404.html', status=404)

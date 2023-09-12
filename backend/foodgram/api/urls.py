@@ -10,7 +10,7 @@ from .views import (
 
 )
 
-handler404 = 'api.views.handler404'
+# handler404 = 'api.views.handler404'
 
 
 router = DefaultRouter()

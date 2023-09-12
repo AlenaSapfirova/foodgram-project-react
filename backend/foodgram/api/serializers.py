@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 import base64
-import webcolors
+# import webcolors
 
 from recipes.models import (
     Amount,
@@ -19,16 +19,16 @@ from recipes.models import (
 from users.models import User, Subscription
 
 
-class Hex2NameColor(serializers.Field):
-    def to_representation(self, value):
-        return value
+# class Hex2NameColor(serializers.Field):
+#     def to_representation(self, value):
+#         return value
 
-    def to_internal_value(self, data):
-        try:
-            data = webcolors.hex_to_name(data)
-        except ValueError:
-            raise serializers.ValidationError('Для этого цвета нет имени')
-        return data
+#     def to_internal_value(self, data):
+#         try:
+#             data = webcolors.hex_to_name(data)
+#         except ValueError:
+#             raise serializers.ValidationError('Для этого цвета нет имени')
+#         return data
 
 
 class Base64ImageField(serializers.ImageField):
@@ -85,35 +85,38 @@ class ShortViewRecipesSerializers(serializers.ModelSerializer):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
-    email = serializers. ReadOnlyField(source='author.email')
-    username = serializers.ReadOnlyField(source='author.username')
-    first_name = serializers.ReadOnlyField(source='author.first_name')
-    last_name = serializers.ReadOnlyField(source='author.last_name')
+    username = serializers.StringRelatedField(read_only=True)
+    email = serializers.StringRelatedField(read_only=True)
+    first_name = serializers.StringRelatedField(read_only=True)
+    last_name = serializers.StringRelatedField(read_only=True)
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
     is_subscribed = serializers.BooleanField(default=True)
 
     class Meta:
         model = Subscription
-        fields = ('email',
-                  'username',
+        fields = ('username',
                   'first_name',
                   'last_name',
+                  'email',
+                  'is_subscribed',
                   'recipes',
                   'recipes_count',
-                  'is_subscribed',
                   'id',)
 
     def get_recipes(self, obj):
-        recipes = Recipes.objects.filter(author=obj)
+        recipes = obj.recipes.all()
         request = self.context['request']
         limit = request.query_params.get('recipes_limit')
         if limit:
-            recipes = recipes[:int(limit)]
-        return ShortViewRecipesSerializers(recipes, many=True).data
+            recipes = recipes[:int(limit)]  
+        serializer = ShortViewRecipesSerializers(recipes, context={
+                                                           'request': request
+                                                        }, many=True)
+        return serializer.data
 
     def get_recipes_count(self, obj):
-        return obj.author.author.count()
+        return obj.recipes.all().count()
 
     def validated_is_subscribed(self, value):
         user = self.context['request'].user

@@ -26,13 +26,11 @@ SECRET_KEY = 'django-insecure-htbb^sbmx+z0t-i63!=))osf^t^$0y#w29s+2(r5%7n__pn43#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = [
-#     'localhost',
-#     '127.0.0.1',
-#     '[::1]',
-#     'testserver',
-# ]
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -45,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'recipes.apps.RecipesConfig',
+    'core.apps.CoreConfig',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
     'djoser',
@@ -52,6 +51,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework.authtoken',
     'django_truncate',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -62,14 +62,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'foodgram.urls'
 
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,7 +133,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -166,3 +169,56 @@ DJOSER = {
         'user_create': ['rest_framework.permissions.AllowAny'],
     }
 }
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     # 'disable_existing_loggers': False,
+#     'filters': {
+#         'require_debug_false': {
+#             '()': 'django.utils.log.RequireDebugFalse',
+#         },
+#         'require_debug_true': {
+#             '()': 'django.utils.log.RequireDebugTrue',
+#         },
+#     },
+#     'formatters': {
+#         'django.server': {
+#             '()': 'django.utils.log.ServerFormatter',
+#             'format': '[{server_time}] {message}',
+#             'style': '{',
+#         }
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'INFO',
+#             #'filters': ['require_debug_true'],
+#             'class': 'logging.StreamHandler',
+#         },
+#         'django.server': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'django.server',
+#         },
+#         'mail_admins': {
+#             'level': 'ERROR',
+#             #'filters': ['require_debug_false'],
+#             'class': 'django.utils.log.AdminEmailHandler'
+#         }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console', 'mail_admins'],
+#             'level': 'INFO',
+#         },
+#         'django.server': {
+#             'handlers': ['django.server'],
+#             'level': 'INFO',
+#             'propagate': False,
+#         },
+#     }
+# }
