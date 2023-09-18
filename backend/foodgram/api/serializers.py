@@ -109,7 +109,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         request = self.context['request']
         limit = request.query_params.get('recipes_limit')
         if limit:
-            recipes = recipes[:int(limit)]  
+            recipes = recipes[:int(limit)]
         serializer = ShortViewRecipesSerializers(recipes, context={
                                                            'request': request
                                                         }, many=True)
@@ -250,12 +250,10 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
         return new
 
     def create(self, validated_data):
-        author = self.context['request'].user
+        # author = self.context['request'].user
         tags = self.initial_data.get('tags')
         ingredients = validated_data.pop('ingredients')
-        recipe = Recipes.objects.update_or_create(
-            author=author, **validated_data
-        )
+        recipe = Recipes.objects.create(**validated_data)
         recipe.tags.set(tags)
         self.create_ingredients_amount(recipe=recipe,
                                        ingredients=ingredients)

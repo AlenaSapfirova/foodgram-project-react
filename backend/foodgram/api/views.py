@@ -26,7 +26,7 @@ from .serializers import (
     SubscriptionSerializer,
     TagSerializer
 )
-from .permissions import AuthorOnly, AuthorOrReadOnly
+from .permissions import AuthorOnly, AuthorOrReadOnly, AdminOrReadOnly
 
 from users.models import User, Subscription
 from .filters import CustomFilters
@@ -72,6 +72,8 @@ class CustomUserViewSet(UserViewSet):
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
+    permission_classes = (AdminOrReadOnly,)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -79,13 +81,14 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('^name', )
+    pagination_class = None
 
 
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     filter_backends = (DjangoFilterBackend,)
     pagination_class = CustomPaginator
-    filterset_class = CustomFilters
+    #filterset_class = CustomFilters
     permission_classes = (AuthorOrReadOnly,)
 
     def get_serializer_class(self):
@@ -123,6 +126,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
+        print(recipe)
         if request.method == "POST":
             if Shopping_Cart.objects.filter(user=user,
                                             recipes=recipe).exists():

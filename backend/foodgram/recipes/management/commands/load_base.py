@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 import csv
 from recipes.models import Ingredient
+from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -8,7 +9,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        with open('../../data/ingredients.csv', encoding='utf-8') as csv_file:
+        with open(f'{settings.BASE_DIR}/data/ingredients.csv',
+                  encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:

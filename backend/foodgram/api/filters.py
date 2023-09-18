@@ -21,6 +21,7 @@ class CustomFilters(filters.FilterSet):
 
     def filter_params_shopping(self, name, queryset, value):
         if self.request.user.is_anonymous:
+            print(queryset)
             return queryset
         return queryset.filter(shopping_cart__user=self.request.user)
 
