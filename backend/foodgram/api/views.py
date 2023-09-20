@@ -22,11 +22,11 @@ from .serializers import (
     CustomUserSerializer,
     GetRecipesSerializer,
     IngredientSerializer,
-    ShortViewRecipesSerializers,
+    ShortViewRecipesSerializer,
     SubscriptionSerializer,
     TagSerializer
 )
-from .permissions import AuthorOnly, AuthorOrReadOnly, AdminOrReadOnly
+from .permissions import AuthorOnly, AuthorOrReadOnly
 
 from users.models import User, Subscription
 from .filters import CustomFilters
@@ -73,7 +73,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
-    permission_classes = (AdminOrReadOnly,)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
@@ -87,9 +86,9 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipesViewSet(viewsets.ModelViewSet):
     queryset = Recipes.objects.all()
     filter_backends = (DjangoFilterBackend,)
+    filterset_class = CustomFilters
     pagination_class = CustomPaginator
-    #filterset_class = CustomFilters
-    permission_classes = (AuthorOrReadOnly,)
+    permission_classes = [AuthorOrReadOnly, ]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -101,8 +100,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
         serializer.save(author=author)
 
     @action(detail=True, methods=['post', 'delete'],
-            serializer_class=ShortViewRecipesSerializers,
-            permission_classes=[IsAuthenticated, ])
+            serializer_class=ShortViewRecipesSerializer,
+            permission_classes=[AuthorOnly, ])
     def favorite(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
@@ -112,21 +111,22 @@ class RecipesViewSet(viewsets.ModelViewSet):
             ).exists():
                 raise ValueError('Такой рецепт уже есть')
             Favorite.objects.create(recipes=recipe, user=user)
-            serializer = self.get_serializer(ShortViewRecipesSerializers(
-                recipe, context={'request': request}
-            ))
+            serializer = ShortViewRecipesSerializer(
+                recipe, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if not Favorite.objects.filter(recipes=recipe, user=user).exists():
             raise ValueError('Рецепт остутствует.')
+        favorited = get_object_or_404(Favorite, recipes=recipe,
+                                      user=user)
+        favorited.delete()
         Favorite.objects.filter(recipes=recipe, user=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True, serializer_class=ShortViewRecipesSerializers,
-            methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True, serializer_class=ShortViewRecipesSerializer,
+            methods=['post', 'delete'], permission_classes=[AuthorOnly])
     def shopping_cart(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
-        print(recipe)
         if request.method == "POST":
             if Shopping_Cart.objects.filter(user=user,
                                             recipes=recipe).exists():
@@ -134,17 +134,17 @@ class RecipesViewSet(viewsets.ModelViewSet):
                     'Такой рецепт уже добавлен в Ваш список покупок.'
                 )
             Shopping_Cart.objects.create(user=user, recipes=recipe)
-            serializer = self.get_serializer(ShortViewRecipesSerializers(
-                recipes=recipe, context={'request': request}
-            ))
-            return Response(serializer.data, stats=status.HTTP_201_CREATED)
+            serializer = ShortViewRecipesSerializer(
+                recipe, context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         if not Shopping_Cart.objects.filter(user=user,
                                             recipes=recipe).exists():
             raise ValueError('Такого рецепта нет.')
         Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, serializer_class=ShortViewRecipesSerializers,
+    @action(detail=False, serializer_class=ShortViewRecipesSerializer,
             permission_classes=[IsAuthenticated, ], methods=['GET'])
     def download_shopping_cart(self, request):
         user = self.request.user
@@ -153,16 +153,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
         shopping_dict = Recipes.objects.filter(
             recipes_shopping_cart_recipes__user=user
         ).values(
-            'ingredients__name', 'ingredients__measurement_unit',
-            'ingredients__ingredient__amount',
+            'ingredients__name', 'ingredients__measurement_unit'
         ).annotate(ingredient_amount=Sum('ingredients__ingredient__amount'))
         data = {}
         shopping_list = []
         for val in shopping_dict:
-            amount = val['ingredient_amount']
-            key = (f'{val["ingredients__name"]}'
-                   f'({val["ingredients__measurement_unit"]})')
-            data[key] = data.get(key, 0) + amount
+            # amount = int(val['ingredients__ingredient__amount'])
+            key = (f'{val["ingredients__name"]}',
+                   f'{val["ingredients__measurement_unit"]}')
+            data[key] = val["ingredient_amount"]
         for key, val in data.items():
             shopping_list.append(f'{key}:{val} \n')
         response = HttpResponse(shopping_list, content_type='text/plain')
