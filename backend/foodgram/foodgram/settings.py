@@ -27,13 +27,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # DEBUG = True
 DEBUG = os.getenv('DEBUG', '')
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
-# ALLOWED_HOSTS = [
-#     '158.160.77.21',
-#     'localhost',
-#     '127.0.0.1',
-#     'alenasap.ddns.net',
-# ]
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = [
+    '158.160.77.21',
+    'localhost',
+    '127.0.0.1',
+    'alenasap.ddns.net',
+]
 # ALLOWED_HOSTS = ['*']
 # CSRF_TRUSTED_ORIGINS = ['https://*.alenasap.ddns.net']
 
