@@ -14,6 +14,7 @@ from recipes.models import (
     Favorite,
     Shopping_Cart,
 )
+
 from users.models import User, Subscription
 
 
@@ -96,9 +97,11 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         limit = request.query_params.get('recipes_limit')
         if limit:
             recipes = recipes[:int(limit)]
-        serializer = ShortViewRecipesSerializer(recipes, context={
-                                                           'request': request
-                                                        }, many=True)
+        serializer = ShortViewRecipesSerializer(
+            recipes,
+            context={'request': request},
+            many=True
+        )
         return serializer.data
 
     def get_recipes_count(self, obj):
