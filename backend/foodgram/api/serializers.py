@@ -1,11 +1,10 @@
+import base64
+
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-
-import base64
-# import webcolors
 
 from recipes.models import (
     Amount,
@@ -15,20 +14,7 @@ from recipes.models import (
     Favorite,
     Shopping_Cart,
 )
-
 from users.models import User, Subscription
-
-
-# class Hex2NameColor(serializers.Field):
-#     def to_representation(self, value):
-#         return value
-
-#     def to_internal_value(self, data):
-#         try:
-#             data = webcolors.hex_to_name(data)
-#         except ValueError:
-#             raise serializers.ValidationError('Для этого цвета нет имени')
-#         return data
 
 
 class Base64ImageField(serializers.ImageField):
@@ -161,12 +147,8 @@ class GetRecipesSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='slug'
     )
-    # ingredients = serializers.SerializerMethodField(
-    #     method_name="get_ingredients")
     ingredients = AmountSerializer(many=True, read_only=True,
                                    source='recipe')
-    # ingredients = IngredientSerializer(many=True, read_only=True)
-    # ingredients = serializers.StringRelatedField(many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -201,7 +183,6 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField(required=True, allow_null=True)
     tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    # tags = TagSerializer(many=True)
     ingredients = AmountSerializer(many=True)
     is_in_shopping_cart = serializers.SerializerMethodField()
     is_favorited = serializers.SerializerMethodField()
@@ -273,7 +254,6 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
         return new
 
     def create(self, validated_data):
-        # author = self.context['request'].user
         tags = self.initial_data.get('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipes.objects.create(**validated_data)

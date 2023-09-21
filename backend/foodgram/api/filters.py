@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from recipes.models import Tag, Recipes
+from recipes.models import Recipes, Tag
 
 
 class CustomFilters(filters.FilterSet):
@@ -30,15 +30,3 @@ class CustomFilters(filters.FilterSet):
     class Meta:
         model = Recipes
         fields = ['tags', 'author', "is_in_shopping_cart", "is_favorited"]
-
-    # def get_is_favorited(self, name, queryset, value):
-    #     user = self.request.user
-    #     if user.is_authenticated and value:
-    #         return queryset.filter(recipes_favorite_recipes__user=user)
-    #     return queryset
-
-    # def get_is_in_shopping_cart(self, name, queryset, value):
-    #     user = self.request.user
-    #     if user.is_authenticated and value:
-    #         return queryset.filter(recipes_shopping_cart_recipes__user=user)
-    #     return queryset

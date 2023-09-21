@@ -6,17 +6,12 @@ from djoser.views import UserViewSet
 from rest_framework import exceptions, status, viewsets
 from rest_framework import filters
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
+from .filters import CustomFilters
 from .pagination import CustomPaginator
-from recipes.models import (
-    Tag,
-    Recipes,
-    Ingredient,
-    Shopping_Cart,
-    Favorite
-)
+from .permissions import AuthorOnly, AuthorOrReadOnly
 from .serializers import (
     CreateUpdateRecipesSerializer,
     CustomUserSerializer,
@@ -26,10 +21,14 @@ from .serializers import (
     SubscriptionSerializer,
     TagSerializer
 )
-from .permissions import AuthorOnly, AuthorOrReadOnly
-
-from users.models import User, Subscription
-from .filters import CustomFilters
+from recipes.models import (
+    Tag,
+    Recipes,
+    Ingredient,
+    Shopping_Cart,
+    Favorite
+)
+from users.models import Subscription, User
 
 
 class CustomUserViewSet(UserViewSet):
@@ -158,7 +157,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
         data = {}
         shopping_list = []
         for val in shopping_dict:
-            # amount = int(val['ingredients__ingredient__amount'])
             key = (f'{val["ingredients__name"]}',
                    f'{val["ingredients__measurement_unit"]}')
             data[key] = val["ingredient_amount"]

@@ -4,10 +4,18 @@ on:
     branches:
       - master
 jobs:
-  checkout-and-print-tree:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Print project tree
-        run: tree .
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+      - name: Install Dependcies
+        run: |
+          python -m install --upgrade pip
+          pip install flake8==6.0.0
+      - name:
+        run: python -m flake8 backend/foodgram/          
