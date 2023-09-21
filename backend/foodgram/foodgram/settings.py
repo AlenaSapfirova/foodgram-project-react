@@ -35,7 +35,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 #     'alenasap.ddns.net',
 # ]
 # ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://alenasap.ddns.net']
+CSRF_TRUSTED_ORIGINS = ['https://*.alenasap.ddns.net']
 
 
 # Application definition
