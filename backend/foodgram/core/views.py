@@ -8,9 +8,4 @@ from django.views.defaults import page_not_found
 
 
 def handler_404(request, exception):
-    try:
-        return page_not_found(request, exception, template_name="404.html")
-    except Exception as error:
-        message = f'Ошибка{error}'
-        print(message)
-        
+    return page_not_found(request, exception, template_name="404.html")
