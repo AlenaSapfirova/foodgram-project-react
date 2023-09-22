@@ -145,12 +145,12 @@ class IngredientSerializer(serializers.ModelSerializer):
 class GetRecipesSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField(required=False, allow_null=True)
-    # tags = serializers.SlugRelatedField(
-    #     many=True,
-    #     read_only=True,
-    #     slug_field='slug'
-    # )
-    tags = TagSerializer(many=True, read_only=True)
+    tags = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='slug'
+    )
+
     ingredients = AmountSerializer(many=True, read_only=True,
                                    source='recipe')
     is_favorited = serializers.SerializerMethodField()
