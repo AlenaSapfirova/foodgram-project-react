@@ -150,7 +150,8 @@ class GetRecipesSerializer(serializers.ModelSerializer):
     #     read_only=True,
     #     slug_field='slug'
     # )
-    tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    tags=TagSerializer(many=True, read_only=True)
     ingredients = AmountSerializer(many=True, read_only=True,
                                    source='recipe')
     is_favorited = serializers.SerializerMethodField()
