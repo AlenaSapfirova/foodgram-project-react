@@ -29,14 +29,15 @@ DEBUG = True
 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 SECRET_KEY = 'django-insecure-htbb^sbmx+z0t-i63!=))osf^t^$0y#w29s+2(r5%7n__pn43#'
-ALLOWED_HOSTS = [
-    '158.160.77.21',
-    'localhost',
-    '127.0.0.1',
-    'alenasap.ddns.net',
-]
-# ALLOWED_HOSTS = ['*']
-# CSRF_TRUSTED_ORIGINS = ['https://*.alenasap.ddns.net']
+# ALLOWED_HOSTS = [
+#     '158.160.77.21',
+#     'localhost',
+#     '127.0.0.1',
+#     'alenasap.ddns.net',
+# ]
+
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://*.alenasap.ddns.net']
 
 
 # Application definition
