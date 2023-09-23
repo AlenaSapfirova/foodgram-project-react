@@ -17,6 +17,8 @@ services:
     volumes:
       - static_volume:/backend_static
       - media_volume:/app/media
+    depends_on:
+      - db
   frontend:
     image: alenasap/foodgram_frontend:latest
     env_file: .env
