@@ -3,6 +3,7 @@ version: '3'
 volumes:
   pg_data_production:
   static_volume:
+  media_volume:
 
 services:
   db:
@@ -15,6 +16,7 @@ services:
     env_file: .env
     volumes:
       - static_volume:/backend_static
+      - media_volume:/app/media
   frontend:
     image: alenasap/foodgram_frontend:latest
     env_file: .env
@@ -26,5 +28,7 @@ services:
     env_file: .env
     volumes:
       - static_volume:/staticfiles/
+      - media_volume:/app/media
+
     ports:
       - 8000:80 
