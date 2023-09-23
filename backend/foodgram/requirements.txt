@@ -36,3 +36,4 @@ uritemplate==4.1.1
 urllib3==2.0.4
 psycopg2-binary==2.9.3 
 webcolors==1.13
+python-dotenv==1.0.0
