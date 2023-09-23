@@ -27,10 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = os.getenv('DEBUG', '')
+# DEBUG = True
+DEBUG = os.getenv('DEBUG', '')
 
-# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 # SECRET_KEY = 'django-insecure-htbb^sbmx+z0t-i63!=))osf^t^$0y#w29s+2(r5%7n__pn43#'
 # ALLOWED_HOSTS = [
 #     '158.160.77.21',
@@ -39,7 +39,7 @@ DEBUG = True
 #     'alenasap.ddns.net',
 # ]
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://*.alenasap.ddns.net']
 
 
