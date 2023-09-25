@@ -292,7 +292,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 'Ошибка: нет тэгов в рецепте'
             )
         for tag in tags:
-            if tag not in recipe.tags.all():
+            if tag not in Tag.objects.all():
                 raise serializers.ValidationError(
                     'Такого тэга не существует.'
                 )
