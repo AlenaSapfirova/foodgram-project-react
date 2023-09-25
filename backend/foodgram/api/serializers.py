@@ -261,7 +261,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             )
         tags_list = []
         for tag in value:
-            if not Tag.objects.get(id=tag):
+            if not Tag.objects.get(id=tag).exists():
                 print('такого тэга нет')
                 raise serializers.ValidationError(
                     'Такого тэга нет'
