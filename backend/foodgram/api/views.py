@@ -110,13 +110,16 @@ class RecipesViewSet(viewsets.ModelViewSet):
             if Favorite.objects.filter(
                 recipes=recipe, user=user
             ).exists():
-                raise ValueError('Такой рецепт уже есть')
+                # raise ValueError('Такой рецепт уже есть', )
+                raise ValueError(detail='Такоу рецепт уже существует',
+                                 code=status.HTTP_404_NOT_FOUND)
             Favorite.objects.create(recipes=recipe, user=user)
             serializer = ShortViewRecipesSerializer(
                 recipe, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if not Favorite.objects.filter(recipes=recipe, user=user).exists():
-            raise ValueError('Рецепт остутствует.')
+        # if not Favorite.objects.filter(recipes=recipe, user=user).exists():
+        #     raise ValueError(detail='Рецепт остутствует.',
+        #                      code=status.HTTP_404_NOT_FOUND)
             # return Response(status=status.HTTP_400_BAD_REQUEST)
         favorited = get_object_or_404(Favorite, recipes=recipe,
                                       user=user)
@@ -140,9 +143,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 recipe, context={'request': request}
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if not Shopping_Cart.objects.filter(user=user,
-                                            recipes=recipe).exists():
-            raise ValueError('Такого рецепта нет.')
+        # if not Shopping_Cart.objects.filter(user=user,
+        #                                     recipes=recipe).exists():
+        #     raise ValueError('Такого рецепта нет.')
         cart = get_object_or_404(Shopping_Cart, recipes=recipe, user=user)
         cart.delete()
         # Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()

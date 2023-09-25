@@ -265,6 +265,10 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'В рецепте не может быть одинаковых тэгов'
                 )
+        if value > 1 and value < 3:
+            raise serializers.ValidationError(
+                'Такого тэга не существует'
+            )
         return value
 
     def create_ingredients_amount(self, ingredients, recipe):
