@@ -266,11 +266,13 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'В рецепте не может быть одинаковых тэгов'
                 )
-        if value < 1 or value > 3:
-            raise serializers.ValidationError(
-                detail='Такого тэга не существует',
-                code=status.HTTP_404_NOT_FOUND
-            )
+        # tags_list=[]
+        for i in value:
+            if i < 1 or i > 3:
+                raise serializers.ValidationError(
+                    detail='Такого тэга не существует',
+                    code=status.HTTP_400_BAD_REQUEST
+                )
         return value
 
     def create_ingredients_amount(self, ingredients, recipe):
