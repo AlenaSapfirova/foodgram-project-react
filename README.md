@@ -188,4 +188,4 @@ POST /api/recipes/
 "cooking_time": 1
 } 
 
-После запуска проект будкт досступен по доменном имени alenasap.ddns.net
+После запуска проект будкт досступен по доменном имени alenasap.ddns.net 

@@ -156,7 +156,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
             recipes_shopping_cart_recipes__user=user
         ).values(
             'ingredients__name', 'ingredients__measurement_unit'
-        ).annotate(ingredient_amount=Sum('ingredients__ingredient__amount'))
+        ).annotate(ingredient_amount=Sum('recipe__amount') )
+        # ).annotate(ingredient_amount=Sum('ingredients__ingredient__amount'))
         data = {}
         shopping_list = []
         for val in shopping_dict:
