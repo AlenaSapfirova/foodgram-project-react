@@ -4,6 +4,7 @@ from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
+from rest_framework import status
 from rest_framework.validators import UniqueValidator
 
 from recipes.models import (
@@ -265,9 +266,10 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'В рецепте не может быть одинаковых тэгов'
                 )
-        if value > 1 and value < 3:
+        if value < 1 or value > 3:
             raise serializers.ValidationError(
-                'Такого тэга не существует'
+                detail='Такого тэга не существует',
+                code=status.HTTP_404_NOT_FOUND
             )
         return value
 
