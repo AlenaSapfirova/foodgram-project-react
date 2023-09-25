@@ -261,12 +261,11 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             )
         tags_list = []
         for tag in value:
-            if tag < 1 or tag > 3:
+            if not Tag.objects.get(id=tag):
                 print('такого тэга нет')
-                # raise serializers.ValidationError(
-                #     'Такого тэга нет'
-                # )
-                print
+                raise serializers.ValidationError(
+                    'Такого тэга нет'
+                )
             tags_list.append(tag)
             if tags_list.count(tag) > 1:
                 raise serializers.ValidationError(
