@@ -112,6 +112,15 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         if user == value:
             return ValueError('на себя подписываться нельзя')
         return value
+    
+    def validate(self, data):
+        user = self.context['request'].user
+        if user.is_anonymous:
+            raise serializers.ValidationError(
+                'Неавторизованный пользователь не может просматривать'
+                'подписки. Авторизуйтесь.'
+            )
+        return data
 
 
 class TagSerializer(serializers.ModelSerializer):
