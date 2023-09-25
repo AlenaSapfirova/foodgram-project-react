@@ -3,6 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer
+# from rest_framework import exceptions, status
 # from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -299,7 +300,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 'Ошибка: нет тэгов в рецепте'
             )
         for tag in tags:
-            if not recipe.tags.get(id=tag).exists():
+            if tag not in recipe.tags.all():
                 raise serializers.ValidationError(
                     'Такого тэга не существует.'
                 )
