@@ -40,13 +40,15 @@ class CustomUserViewSet(UserViewSet):
             serializer_class=SubscriptionSerializer, methods=['get'])
     def subscriptions(self, request):
         user = request.user
-        query = User.objects.filter(subscribe__user=user)
-        serializer = SubscriptionSerializer(query, many=True,
-                                            context={'request': request})
-        page = self.paginate_queryset(query)
-        serializer = SubscriptionSerializer(page, many=True,
-                                            context={'request': request})
-        return self.get_paginated_response(serializer.data)
+        if user.is_authenticated:
+            query = User.objects.filter(subscribe__user=user)
+            serializer = SubscriptionSerializer(query, many=True,
+                                                context={'request': request})
+            page = self.paginate_queryset(query)
+            serializer = SubscriptionSerializer(page, many=True,
+                                                context={'request': request})
+            return self.get_paginated_response(serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(serializer_class=SubscriptionSerializer,
             methods=['post', 'delete'],
@@ -98,8 +100,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         author = self.request.user
-        serializer.is_valid(raise_exception=True)
-        serializer.save(author=author)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(author=author)
 
     @action(detail=True, methods=['post', 'delete'],
             serializer_class=ShortViewRecipesSerializer,
