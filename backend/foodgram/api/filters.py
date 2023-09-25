@@ -17,13 +17,13 @@ class CustomFilters(filters.FilterSet):
 
     def get_is_favorited(self, queryset, name, value):
         user = self.request.user
-        if user.is_authenticated and value and name:
+        if user.is_authenticated and value and name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
-        if user.is_authenticated and value and name == 'is_favorited':
+        if user.is_authenticated and value and name == 'is_in_shopping_cart':
             return queryset.filter(recipes_shopping_cart_recipes__user=user)
         return queryset
 

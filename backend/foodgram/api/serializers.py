@@ -134,6 +134,18 @@ class AmountSerializer(serializers.ModelSerializer):
         model = Amount
         fields = ('id', 'amount', 'measurement_unit', 'name')
 
+    def validate_amount(self, value):
+        if value < 1:
+            raise serializers.ValidationError(
+                "Количество ингредиентов не может быть отрицательным"
+            )
+        if value > 1000:
+            raise serializers.ValidationError(
+                'Слишком большое количество ингредиента в рецепте.'
+                'Проверьте правильность заполнения поля "количество"'
+            )
+        return value
+
 
 class IngredientSerializer(serializers.ModelSerializer):
 
