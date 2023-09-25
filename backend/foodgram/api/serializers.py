@@ -3,8 +3,6 @@ import base64
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer
-# from rest_framework import exceptions, status
-# from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -175,12 +173,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 class GetRecipesSerializer(serializers.ModelSerializer):
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField(required=False, allow_null=True)
-    # tags = serializers.SlugRelatedField(
-    #     many=True,
-    #     read_only=True,
-    #     slug_field='slug'
-    # )
-    # tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     ingredients = AmountSerializer(many=True, read_only=True,
                                    source='recipe')
