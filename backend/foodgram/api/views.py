@@ -63,7 +63,9 @@ class CustomUserViewSet(UserViewSet):
                             status=status.HTTP_201_CREATED)
         author = get_object_or_404(User, id=id)
         user = request.user
-        subscribe = Subscription.objects.filter(user=user, author=author)
+        subscribe = get_object_or_404(Subscription, user=user,
+                                      author=author)
+        # subscribe = Subscription.objects.filter(user=user, author=author)
         subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
