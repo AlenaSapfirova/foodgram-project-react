@@ -288,13 +288,20 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             new = Amount.objects.create(ingredient=ingredient,
                                         amount=amount,
                                         recipe=recipe)
-
+        if not new:
+            raise serializers.ValidationError(
+                'Ошибка: игредиентов не указано'
+            )
         return new
 
     def create(self, validated_data):
         tags = self.initial_data.get('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipes.objects.create(**validated_data)
+        if not tags:
+            raise serializers.ValidationError(
+                'Ошибка: нет тэгов в рецепте'
+            )
         recipe.tags.set(tags)
         self.create_ingredients_amount(recipe=recipe,
                                        ingredients=ingredients)
