@@ -98,6 +98,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         author = self.request.user
+        serializer.is_valid(raise_exception=True)
         serializer.save(author=author)
 
     @action(detail=True, methods=['post', 'delete'],
