@@ -2,10 +2,8 @@ import base64
 
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
-from django.db import IntegrityError
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
-# from rest_framework import status
 from rest_framework.validators import UniqueValidator
 
 from recipes.models import (
@@ -271,7 +269,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
         for tag in value:
             if not Tag.objects.get(id=tag).exists():
                 print('такого тэга нет')
-                raise IntegrityError(
+                raise serializers.ValidationError(
                     'Такого тэга нет'
                 )
             tags_list.append(tag)
