@@ -130,6 +130,13 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'color', 'slug', "name")
 
+    def validated(self, data):
+        if data['id'] not in [1, 2, 3]:
+            raise serializers.ValidationError(
+                "Такого тэга нет"
+            )
+        return data
+
 
 class AmountSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(source='ingredient.id',
