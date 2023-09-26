@@ -40,15 +40,19 @@ class CustomUserViewSet(UserViewSet):
             serializer_class=SubscriptionSerializer, methods=['get'])
     def subscriptions(self, request):
         user = request.user
-        if user.is_authenticated:
-            query = User.objects.filter(subscribe__user=user)
-            serializer = SubscriptionSerializer(query, many=True,
-                                                context={'request': request})
-            page = self.paginate_queryset(query)
-            serializer = SubscriptionSerializer(page, many=True,
-                                                context={'request': request})
-            return self.get_paginated_response(serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        if user.is_anonymous:
+            raise ValueError(
+                'Неавторизованные пользователи не могут'
+                'видеть свои подписки'
+            )
+        query = User.objects.filter(subscribe__user=user)
+        serializer = SubscriptionSerializer(query, many=True,
+                                            context={'request': request})
+        page = self.paginate_queryset(query)
+        serializer = SubscriptionSerializer(page, many=True,
+                                            context={'request': request})
+        return self.get_paginated_response(serializer.data)
+        # return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(serializer_class=SubscriptionSerializer,
             methods=['post', 'delete'],
@@ -109,13 +113,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
+        if user.is_anonymous:
+            raise ValueError(
+                'Вы неавторизованы. Авторизуйтесь'
+            )
         if request.method == 'POST':
             if Favorite.objects.filter(
                 recipes=recipe, user=user
             ).exists():
-                # raise ValueError('Такой рецепт уже есть', )
-                raise ValueError(detail='Такоу рецепт уже существует',
-                                 code=status.HTTP_404_NOT_FOUND)
+                raise ValueError('Такоу рецепт уже существует')
             Favorite.objects.create(recipes=recipe, user=user)
             serializer = ShortViewRecipesSerializer(
                 recipe, context={'request': request})
@@ -132,6 +138,10 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
+        if user.is_anonymous:
+            raise ValueError(
+                "Вы неавторизованы. Авторизуйтесь"
+            )
         if request.method == "POST":
             if Shopping_Cart.objects.filter(user=user,
                                             recipes=recipe).exists():
@@ -143,12 +153,12 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 recipe, context={'request': request}
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # if not Shopping_Cart.objects.filter(user=user,
-        #                                     recipes=recipe).exists():
-        #     raise ValueError('Такого рецепта нет.')
-        cart = get_object_or_404(Shopping_Cart, recipes=recipe, user=user)
-        cart.delete()
-        # Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
+        if not Shopping_Cart.objects.filter(user=user,
+                                            recipes=recipe).exists():
+            raise ValueError('Такого рецепта нет.')
+        # cart = get_object_or_404(Shopping_Cart, recipes=recipe, user=user)
+        # cart.delete()
+        Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, serializer_class=ShortViewRecipesSerializer,
