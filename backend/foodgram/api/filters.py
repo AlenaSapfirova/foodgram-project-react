@@ -1,5 +1,7 @@
 from django_filters import rest_framework as filters
+from rest_framework.response import Response
 from rest_framework import serializers
+from rest_framework import status
 
 from recipes.models import Recipes, Tag
 
@@ -18,12 +20,10 @@ class CustomFilters(filters.FilterSet):
 
     def get_is_favorited(self, queryset, name, value):
         user = self.request.user
-        if user.is_anonymous:
-            raise serializers.ValidationError(
-                'Неавторизованный пользователь не имеет избранного'
-            )
         if user.is_authenticated and value and name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
+        if user.is_anonymous:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
