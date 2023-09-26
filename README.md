@@ -7,6 +7,8 @@
 подписываться на других пользователей
 скачать список ингредиентов для рецептов, добавленных в "Корзину"
 
+ПОСЛЕ ЗАПУСКА ПРОЕКТ БУДЕТ ДОСТУПЕН НА ДОМЕНЕ alenasap.ddns.net 33
+
 Установка :
  - установите Docker на свой компьютер. Вся информация об этом есть на официальном сайте (https://docs.docker.com/engine/install/)
   - склонируйте на свой проект репозиторий https://github.com/AlenaSapfirova/foodgram-project-react
@@ -15,6 +17,19 @@
   - выполинте миграции docker-compose exec backend python manage.py migrate
   - соберите статику docker-compose exec backend python manage.py collectstatic --no-input
   - загрузите базу ингредиентов sudo docker exec -it foodgram-project-react-backend-1 bash -> python manage.py load_base
+  - создайте суперпользователя , находясь в контейнере  sudo docker exec -it foodgram-project-react-backend-1 bash -> python manage.py createsuperuser
+
+ Переменные окруужения: 
+  Проект использует базу данных PostgreSQL. Все переменные окруженя находятся в папке .env в корне проекта.
+
+  DB_HOST=db
+  DB_PORT=5432
+  POSTGRES_USER=foodgram
+  POSTGRES_PASSWORD=foodgram
+  POSTGRES_DB=foodgram
+  SECRET_KEY = 'django-insecure-htbb^sbmx+z0t-i63!=))osf^t^$0y#w29s+2(r5%7n__pn43#'
+  DEBUG = False
+  ALLOWED_HOSTS = 158.160.77.21,localhost,127.0.0.1,alenasap.ddns.net
   
 
 Корректировка\доработка репозитория:
@@ -188,4 +203,4 @@ POST /api/recipes/
 "cooking_time": 1
 } 
 
-После запуска проект будкт досступен по доменном имени alenasap.ddns.net 
+ПОСЛЕ ЗАПУСКА ПРОЕКТ БУДЕТ ДОСТУПЕН НА ДОМЕНЕ alenasap.ddns.net 
