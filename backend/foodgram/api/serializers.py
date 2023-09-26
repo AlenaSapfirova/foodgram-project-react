@@ -130,13 +130,6 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'color', 'slug', "name")
 
-    def validated(self, data):
-        if data['id'] not in [1, 2, 3]:
-            raise serializers.ValidationError(
-                "Такого тэга нет"
-            )
-        return data
-
 
 class AmountSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(source='ingredient.id',
@@ -267,11 +260,6 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'В рецепте не может быть одинаковых тэгов'
                 )
-        # for tag in value:
-        #     if not Tag.objects.(id=tag).exists():
-        #         raise serializers.ValidationError(
-        #             'такого тэга нет'
-        #         )
         return value
 
     def create_ingredients_amount(self, ingredients, recipe):
