@@ -40,19 +40,16 @@ class CustomUserViewSet(UserViewSet):
             serializer_class=SubscriptionSerializer, methods=['get'])
     def subscriptions(self, request):
         user = request.user
-        if user.is_anonymous:
-            raise ValueError(
-                'Неавторизованные пользователи не могут'
-                'видеть свои подписки'
-            )
-        query = User.objects.filter(subscribe__user=user)
-        serializer = SubscriptionSerializer(query, many=True,
-                                            context={'request': request})
-        page = self.paginate_queryset(query)
-        serializer = SubscriptionSerializer(page, many=True,
-                                            context={'request': request})
-        return self.get_paginated_response(serializer.data)
-        # return Response(status=status.HTTP_400_BAD_REQUEST)
+        if user.is_athenticated:
+            query = User.objects.filter(subscribe__user=user)
+            serializer = SubscriptionSerializer(query, many=True,
+                                                context={'request': request})
+            page = self.paginate_queryset(query)
+            serializer = SubscriptionSerializer(page, many=True,
+                                                context={'request': request})
+            return self.get_paginated_response(serializer.data)
+        return (f'Вы неавторизованы,'
+                f'{Response(status=status.HTTP_400_BAD_REQUEST)}')
 
     @action(serializer_class=SubscriptionSerializer,
             methods=['post', 'delete'],
@@ -109,14 +106,10 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post', 'delete'],
             serializer_class=ShortViewRecipesSerializer,
-            permission_classes=[AuthorOnly, ])
+            permission_classes=[IsAuthenticated, ])
     def favorite(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
-        if user.is_anonymous:
-            raise ValueError(
-                'Вы неавторизованы. Авторизуйтесь'
-            )
         if request.method == 'POST':
             if Favorite.objects.filter(
                 recipes=recipe, user=user
