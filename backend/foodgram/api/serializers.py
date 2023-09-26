@@ -267,11 +267,11 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'В рецепте не может быть одинаковых тэгов'
                 )
-        for tag in value:
-            if not Tag.objects.get(id=tag).exists():
-                raise serializers.ValidationError(
-                    'такого тэга нет'
-                )
+        # for tag in value:
+        #     if not Tag.objects.(id=tag).exists():
+        #         raise serializers.ValidationError(
+        #             'такого тэга нет'
+        #         )
         return value
 
     def create_ingredients_amount(self, ingredients, recipe):
@@ -297,7 +297,11 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Ошибка: нет тэгов в рецепте'
             )
-    
+        for i in tags:
+            if not Tag.objects.filter(id=i).exists():
+                raise serializers.ValidationError(
+                    'такого тэга нет.'
+                )
         recipe.tags.set(tags)
         self.create_ingredients_amount(recipe=recipe,
                                        ingredients=ingredients)
