@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
-from rest_framework.response import Response
-from rest_framework import status
+# from rest_framework.response import Response
+# from rest_framework import status
 
 from recipes.models import Recipes, Tag
 
@@ -21,16 +21,16 @@ class CustomFilters(filters.FilterSet):
         user = self.request.user
         if user.is_authenticated and value and name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
-        if user.is_anonymous:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        # if user.is_anonymous:
+        #     return Response(status=status.HTTP_401_UNAUTHORIZED)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
         if user.is_authenticated and value and name == 'is_in_shopping_cart':
             return queryset.filter(recipes_shopping_cart_recipes__user=user)
-        if user.is_anonymous:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        # if user.is_anonymous:
+        #     return Response(status=status.HTTP_401_UNAUTHORIZED)
         return queryset
 
     class Meta:

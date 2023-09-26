@@ -123,10 +123,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        # if not Favorite.objects.filter(recipes=recipe, user=user).exists():
-        #     raise ValueError(detail='Рецепт остутствует.',
-        #                      code=status.HTTP_404_NOT_FOUND)
-            # return Response(status=status.HTTP_400_BAD_REQUEST)
+       
         if user.is_authenticated:
             favorited = get_object_or_404(Favorite, recipes=recipe,
                                           user=user)
@@ -184,3 +181,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
             'attachment; filename= {0}'.format('shopping_list.txt')
         )
         return response
+
+
+# if not Favorite.objects.filter(recipes=recipe, user=user).exists():
+# raise ValueError(detail='Рецепт остутствует.',
+#  code=status.HTTP_404_NOT_FOUND)
+# return Response(status=status.HTTP_400_BAD_REQUEST)
