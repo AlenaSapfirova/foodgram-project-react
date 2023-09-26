@@ -289,7 +289,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags = self.initial_data.get('tags')
         ingredients = validated_data.pop('ingredients')
-        if ingredients is None:
+        if not ingredients:
             raise serializers.ValidationError(
                 'Ошибка: нет ингредиентов'
             )
