@@ -3,7 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer
-from django.shortcuts import get_object_or_404
+# from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -268,7 +268,10 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                     'В рецепте не может быть одинаковых тэгов'
                 )
         for tag in value:
-            get_object_or_404(Tag, id=tag)
+            if not Tag.objects.get(id=tag).exists():
+                raise serializers.ValidationError(
+                    'такого тэга нет'
+                )
         return value
 
     def create_ingredients_amount(self, ingredients, recipe):
@@ -280,10 +283,6 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             new = Amount.objects.create(ingredient=ingredient,
                                         amount=amount,
                                         recipe=recipe)
-        # if not new:
-        #     raise serializers.ValidationError(
-        #         'Ошибка: игредиентов не указано'
-            # )
         return new
 
     def create(self, validated_data):
