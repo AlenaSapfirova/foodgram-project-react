@@ -48,8 +48,7 @@ class CustomUserViewSet(UserViewSet):
             serializer = SubscriptionSerializer(page, many=True,
                                                 context={'request': request})
             return self.get_paginated_response(serializer.data)
-        return (f'Вы неавторизованы,'
-                f'{Response(status=status.HTTP_400_BAD_REQUEST)}')
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(serializer_class=SubscriptionSerializer,
             methods=['post', 'delete'],
@@ -111,15 +110,17 @@ class RecipesViewSet(viewsets.ModelViewSet):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
         if request.method == 'POST':
-            if Favorite.objects.filter(
-                recipes=recipe, user=user
-            ).exists():
-                raise ValueError('Такоу рецепт уже существует')
-            Favorite.objects.create(recipes=recipe, user=user)
-            serializer = ShortViewRecipesSerializer(
-                recipe, context={'request': request})
-            return Response(serializer.data,
-                            status=status.HTTP_201_CREATED)
+            if user.is_authenticated:
+                if Favorite.objects.filter(
+                    recipes=recipe, user=user
+                ).exists():
+                    raise ValueError('Такоу рецепт уже существует')
+                Favorite.objects.create(recipes=recipe, user=user)
+                serializer = ShortViewRecipesSerializer(
+                    recipe, context={'request': request})
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         favorited = get_object_or_404(Favorite, recipes=recipe,
                                       user=user)
         favorited.delete()
@@ -131,28 +132,27 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
-        if user.is_anonymous:
-            raise ValueError(
-                "Вы неавторизованы. Авторизуйтесь"
-            )
-        if request.method == "POST":
-            if Shopping_Cart.objects.filter(user=user,
-                                            recipes=recipe).exists():
-                raise ValueError(
-                    'Такой рецепт уже добавлен в Ваш список покупок.'
+        if user.is_authenticated:
+            if request.method == "POST":
+                if Shopping_Cart.objects.filter(user=user,
+                                                recipes=recipe).exists():
+                    raise ValueError(
+                        'Такой рецепт уже добавлен в Ваш список покупок.'
+                    )
+                Shopping_Cart.objects.create(user=user, recipes=recipe)
+                serializer = ShortViewRecipesSerializer(
+                    recipe, context={'request': request}
                 )
-            Shopping_Cart.objects.create(user=user, recipes=recipe)
-            serializer = ShortViewRecipesSerializer(
-                recipe, context={'request': request}
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if not Shopping_Cart.objects.filter(user=user,
-                                            recipes=recipe).exists():
-            raise ValueError('Такого рецепта нет.')
-        # cart = get_object_or_404(Shopping_Cart, recipes=recipe, user=user)
-        # cart.delete()
-        Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
+            if not Shopping_Cart.objects.filter(user=user,
+                                                recipes=recipe).exists():
+                raise ValueError('Такого рецепта нет.')
+            # cart = get_object_or_404(Shopping_Cart, recipes=recipe,user=user)
+            # cart.delete()
+            Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=False, serializer_class=ShortViewRecipesSerializer,
             permission_classes=[IsAuthenticated, ], methods=['GET'])
