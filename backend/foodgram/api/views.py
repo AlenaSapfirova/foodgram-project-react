@@ -40,7 +40,7 @@ class CustomUserViewSet(UserViewSet):
             serializer_class=SubscriptionSerializer, methods=['get'])
     def subscriptions(self, request):
         user = request.user
-        if user.is_athenticated:
+        if user.is_authenticated:
             query = User.objects.filter(subscribe__user=user)
             serializer = SubscriptionSerializer(query, many=True,
                                                 context={'request': request})
