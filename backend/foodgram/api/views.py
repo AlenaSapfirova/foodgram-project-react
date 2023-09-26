@@ -110,27 +110,22 @@ class RecipesViewSet(viewsets.ModelViewSet):
         user = self.request.user
         recipe = get_object_or_404(Recipes, id=pk)
         if request.method == 'POST':
-            if user.is_authenticated:
-                if Favorite.objects.filter(
-                    recipes=recipe, user=user
-                ).exists():
-                    # raise ValueError('Такой рецепт уже есть', )
-                    raise ValueError(detail='Такоу рецепт уже существует',
-                                     code=status.HTTP_404_NOT_FOUND)
-                Favorite.objects.create(recipes=recipe, user=user)
-                serializer = ShortViewRecipesSerializer(
-                    recipe, context={'request': request})
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-       
-        if user.is_authenticated:
-            favorited = get_object_or_404(Favorite, recipes=recipe,
-                                          user=user)
-            favorited.delete()
-            # Favorite.objects.filter(recipes=recipe, user=user).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+            if Favorite.objects.filter(
+                recipes=recipe, user=user
+            ).exists():
+                # raise ValueError('Такой рецепт уже есть', )
+                raise ValueError(detail='Такоу рецепт уже существует',
+                                 code=status.HTTP_404_NOT_FOUND)
+            Favorite.objects.create(recipes=recipe, user=user)
+            serializer = ShortViewRecipesSerializer(
+                recipe, context={'request': request})
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+        favorited = get_object_or_404(Favorite, recipes=recipe,
+                                      user=user)
+        favorited.delete()
+        # Favorite.objects.filter(recipes=recipe, user=user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, serializer_class=ShortViewRecipesSerializer,
             methods=['post', 'delete'], permission_classes=[AuthorOnly])
