@@ -3,6 +3,7 @@ import base64
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -257,19 +258,17 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
     def validate_tags(self, value):
         if value is None:
             raise serializers.ValidationError(
-                'В рецепте должен быть хоть 1 тэг'
+                'В рецепте get быть хоть 1 тэг'
             )
         tags_list = []
         for tag in value:
-            if not Tag.objects.get(id=tag).exists():
-                raise serializers.ValidationError(
-                    'Такого тэга нет'
-                )
             tags_list.append(tag)
             if tags_list.count(tag) > 1:
                 raise serializers.ValidationError(
                     'В рецепте не может быть одинаковых тэгов'
                 )
+        for tag in value:
+            get_object_or_404(Tag, id=tag)
         return value
 
     def create_ingredients_amount(self, ingredients, recipe):
@@ -281,15 +280,19 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             new = Amount.objects.create(ingredient=ingredient,
                                         amount=amount,
                                         recipe=recipe)
-        if not new:
-            raise serializers.ValidationError(
-                'Ошибка: игредиентов не указано'
-            )
+        # if not new:
+        #     raise serializers.ValidationError(
+        #         'Ошибка: игредиентов не указано'
+            # )
         return new
 
     def create(self, validated_data):
         tags = self.initial_data.get('tags')
         ingredients = validated_data.pop('ingredients')
+        if ingredients is None:
+            raise serializers.ValidationError(
+                'Ошибка: нет ингредиентов'
+            )
         recipe = Recipes.objects.create(**validated_data)
         if not tags:
             raise serializers.ValidationError(
