@@ -22,6 +22,7 @@ class CustomFilters(filters.FilterSet):
         # if name == 'is_favorited':
         if value:
             return queryset.filter(recipes_favorite_recipes__user=user)
+        return queryset
         # if (
         #     user.is_authenticated and value is True
         #     and name == 'is_favorited'
