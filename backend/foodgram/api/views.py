@@ -124,9 +124,10 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 recipe, context={'request': request})
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
-        if Favorite.objects.filter(id=pk).exists():
+        if Favorite.objects.filter(recipes=recipe, user=user).exists():
             Favorite.objects.filter(recipes=recipe, user=user).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+        print(Favorite.objects.filter(id=pk).exists())
         return Response(status=status.HTTP_400_BAD_REQUEST)
         # favorited = get_object_or_404(Favorite, recipes=recipe,
         #                                 user=user)
