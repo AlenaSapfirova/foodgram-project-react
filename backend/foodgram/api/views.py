@@ -54,7 +54,6 @@ class CustomUserViewSet(UserViewSet):
         serializer = SubscriptionSerializer(page, many=True,
                                             context={'request': request})
         return self.get_paginated_response(serializer.data)
-        # return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(serializer_class=SubscriptionSerializer,
             methods=['post', 'delete'],

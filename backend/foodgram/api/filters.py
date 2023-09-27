@@ -19,12 +19,14 @@ class CustomFilters(filters.FilterSet):
 
     def get_is_favorited(self, queryset, name, value):
         user = self.request.user
-        if (
-            user.is_authenticated and value is True
-            and name == 'is_favorited'
-        ):
+        if name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+        # if (
+        #     user.is_authenticated and value is True
+        #     and name == 'is_favorited'
+        # ):
+            # return queryset.filter(recipes_favorite_recipes__user=user)
+        # return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
