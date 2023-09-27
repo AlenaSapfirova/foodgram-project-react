@@ -119,12 +119,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 recipe, context={'request': request})
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
-        if request.method == 'DELETE':
-            favorited = get_object_or_404(Favorite, recipes=recipe,
-                                          user=user)
-            favorited.delete()
-            # Favorite.objects.filter(recipes=recipe, user=user).delete()
+        if Favorite.objects.filter(id=pk).exists():
+            Favorite.objects.filter(recipes=recipe, user=user).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+        # favorited = get_object_or_404(Favorite, recipes=recipe,
+        #                                 user=user)
+        # favorited.delete()
+        # Favorite.objects.filter(recipes=recipe, user=user).delete()
         # return Response(status=status.HTTP_400UNAUTHORIZED)
 
     @action(detail=True, serializer_class=ShortViewRecipesSerializer,
@@ -144,14 +146,15 @@ class RecipesViewSet(viewsets.ModelViewSet):
             )
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
-        if not Shopping_Cart.objects.filter(user=user,
-                                            recipes=recipe).exists():
-            raise ValueError('Такого рецепта нет.')
-            # cart = get_object_or_404(Shopping_Cart,
-            # recipes=recipe,user=user)
-            # cart.delete()
-        Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if Shopping_Cart.objects.filter(user=user,
+                                        recipes=recipe).exists():
+            Shopping_Cart.objects.filter(recipes=recipe, user=user).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+        # raise ValueError('Такого рецепта нет.')
+        # cart = get_object_or_404(Shopping_Cart,
+        # recipes=recipe,user=user)
+        # cart.delete()
 
     @action(detail=False, serializer_class=ShortViewRecipesSerializer,
             permission_classes=[IsAuthenticated, ], methods=['GET'])
