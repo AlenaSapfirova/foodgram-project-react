@@ -19,10 +19,9 @@ class CustomFilters(filters.FilterSet):
 
     def get_is_favorited(self, queryset, name, value):
         user = self.request.user
-        # if name == 'is_favorited':
-        if value:
+        if user.is_authenticated and value is True and name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
-        return queryset
+        return False
         # if (
         #     user.is_authenticated and value is True
         #     and name == 'is_favorited'
