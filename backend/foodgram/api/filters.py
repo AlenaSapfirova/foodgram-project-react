@@ -25,7 +25,6 @@ class CustomFilters(filters.FilterSet):
         ):
             return queryset.filter(recipes_favorite_recipes__user=user)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
