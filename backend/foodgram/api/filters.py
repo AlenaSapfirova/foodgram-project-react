@@ -10,12 +10,12 @@ class CustomFilters(filters.FilterSet):
                                              to_field_name='slug',
                                              queryset=Tag.objects.all())
     author = filters.NumberFilter(field_name='author')
-    is_favorited = filters.BooleanFilter(field_name='is_favorited',
-                                         method='get_is_favorited')
+    is_favorited = filters.BooleanFilter(field_name='is_favorited')
+    #  method='get_is_favorited')
     is_in_shopping_cart = filters.BooleanFilter(
-        field_name='is_in_shopping_cart',
-        method='get_is_in_shopping_cart'
-    )
+        field_name='is_in_shopping_cart')
+    #     method='get_is_in_shopping_cart'
+    # )
 
     # def get_is_favorited(self, queryset, name, value):
     #     user = self.request.user
