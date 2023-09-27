@@ -5,9 +5,12 @@ from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import exceptions, status, viewsets
 from rest_framework import filters
+# from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import serializers
+
 
 from .filters import CustomFilters
 from .pagination import CustomPaginator
@@ -113,16 +116,21 @@ class RecipesViewSet(viewsets.ModelViewSet):
             if Favorite.objects.filter(
                 recipes=recipe, user=user
             ).exists():
-                raise ValueError('Такоу рецепт уже существует')
+                raise serializers.ValidationError(
+                    'Такоу рецепт уже существует'
+                )
             Favorite.objects.create(recipes=recipe, user=user)
             serializer = ShortViewRecipesSerializer(
                 recipe, context={'request': request})
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
-        if Favorite.objects.filter(id=pk).exists():
-            Favorite.objects.filter(recipes=recipe, user=user).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not Favorite.objects.filter(id=pk).exists():
+            raise serializers.ValidationError(
+                'Такого рецепта в избранном нет'
+            )
+        Favorite.objects.filter(recipes=recipe, user=user).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        # return Response(status=status.HTTP_400_BAD_REQUEST)
         # favorited = get_object_or_404(Favorite, recipes=recipe,
         #                                 user=user)
         # favorited.delete()
