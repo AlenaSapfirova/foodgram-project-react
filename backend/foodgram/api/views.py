@@ -124,13 +124,10 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 recipe, context={'request': request})
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
-        if not Favorite.objects.filter(id=pk).exists():
-            raise serializers.ValidationError(
-                'Такого рецепта в избранном нет'
-            )
-        Favorite.objects.filter(recipes=recipe, user=user).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-        # return Response(status=status.HTTP_400_BAD_REQUEST)
+        if Favorite.objects.filter(id=pk).exists():
+            Favorite.objects.filter(recipes=recipe, user=user).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
         # favorited = get_object_or_404(Favorite, recipes=recipe,
         #                                 user=user)
         # favorited.delete()
