@@ -1,6 +1,7 @@
 import base64
 
 from django.core.files.base import ContentFile
+from django.db import transaction
 from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
@@ -271,7 +272,8 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                                         amount=amount,
                                         recipe=recipe)
         return new
-
+    
+    @transaction.atomic
     def create(self, validated_data):
         tags = self.initial_data.get('tags')
         ingredients = validated_data.pop('ingredients')
@@ -284,6 +286,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Ошибка: нет тэгов в рецепте'
             )
+        
         for i in tags:
             if not Tag.objects.filter(id=i).exists():
                 raise serializers.ValidationError(
