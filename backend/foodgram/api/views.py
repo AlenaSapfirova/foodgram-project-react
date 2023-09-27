@@ -43,15 +43,18 @@ class CustomUserViewSet(UserViewSet):
             serializer_class=SubscriptionSerializer, methods=['get'])
     def subscriptions(self, request):
         user = request.user
-        if user.is_authenticated:
-            query = User.objects.filter(subscribe__user=user)
-            serializer = SubscriptionSerializer(query, many=True,
-                                                context={'request': request})
-            page = self.paginate_queryset(query)
-            serializer = SubscriptionSerializer(page, many=True,
-                                                context={'request': request})
-            return self.get_paginated_response(serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        if user.is_anonymous:
+            raise serializers.ValidationError(
+                'Вы неавторизованы. Авторизуйтесь'
+            )
+        query = User.objects.filter(subscribe__user=user)
+        serializer = SubscriptionSerializer(query, many=True,
+                                            context={'request': request})
+        page = self.paginate_queryset(query)
+        serializer = SubscriptionSerializer(page, many=True,
+                                            context={'request': request})
+        return self.get_paginated_response(serializer.data)
+        # return Response(status=status.HTTP_400_BAD_REQUEST)
 
     @action(serializer_class=SubscriptionSerializer,
             methods=['post', 'delete'],
