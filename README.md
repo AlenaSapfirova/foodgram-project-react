@@ -17,7 +17,12 @@
   - выполинте миграции docker-compose exec backend python manage.py migrate
   - соберите статику docker-compose exec backend python manage.py collectstatic --no-input
   - загрузите базу ингредиентов sudo docker exec -it foodgram-project-react-backend-1 bash -> python manage.py load_base
-  - создайте суперпользователя , находясь в контейнере  sudo docker exec -it foodgram-project-react-backend-1 bash -> python manage.py createsuperuser
+  - создайте суперпользователя , находясь в контейнере  sudo docker exec -it foodgram-project-react-backend-1 bash -> python manage.py createsuperuser.
+  Админ-панель будет доступна по адресу https://alenasap.ddns.net/admin/
+  Для входа можно воспользоваться данными созданного вами суперюзера, а можно использовать эти:
+  - email: sapfirova@yandex.ru 
+  - password: 300613ivan
+  
 
  Переменные окруужения: 
   Проект использует базу данных PostgreSQL. Все переменные окруженя находятся в папке .env в корне проекта.
