@@ -24,9 +24,8 @@ class CustomFilters(filters.FilterSet):
             and name == 'is_favorited'
         ):
             return queryset.filter(recipes_favorite_recipes__user=user)
-        if user.is_anonymous:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        return queryset
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
 
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
@@ -35,9 +34,7 @@ class CustomFilters(filters.FilterSet):
             and name == 'is_in_shopping_cart'
         ):
             return queryset.filter(recipes_shopping_cart_recipes__user=user)
-        if user.is_anonymous:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        return queryset
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     class Meta:
         model = Recipes
