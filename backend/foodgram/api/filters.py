@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
-from rest_framework.response import Response
-from rest_framework import status
+# from rest_framework.response import Response
+# from rest_framework import status
 
 from recipes.models import Recipes, Tag
 
@@ -17,26 +17,24 @@ class CustomFilters(filters.FilterSet):
         method='get_is_in_shopping_cart'
     )
 
-    def get_is_favorited(self, queryset, name, value):
-        user = self.request.user
-        if user.is_authenticated and value is True and name == 'is_favorited':
-            return queryset.filter(recipes_favorite_recipes__user=user)
-        return False
-        # if (
-        #     user.is_authenticated and value is True
-        #     and name == 'is_favorited'
-        # ):
-        # return queryset.filter(recipes_favorite_recipes__user=user)
-        # return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # def get_is_favorited(self, queryset, name, value):
+    #     user = self.request.user
+    #     if user.is_authenticated and value is True
+    # and name == 'is_favorited':
+    #         return queryset.filter(recipes_favorite_recipes__user=user)
+    #     return False
+    # if (
+    #     user.is_authenticated and value is True
 
-    def get_is_in_shopping_cart(self, queryset, name, value):
-        user = self.request.user
-        if (
-            user.is_authenticated and value is True
-            and name == 'is_in_shopping_cart'
-        ):
-            return queryset.filter(recipes_shopping_cart_recipes__user=user)
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # def get_is_in_shopping_cart(self, queryset, name, value):
+    #     user = self.request.user
+    #     if (
+    #         user.is_authenticated and value is True
+    #         and name == 'is_in_shopping_cart'
+    #     ):
+    #         return queryset.filter(
+    # recipes_shopping_cart_recipes__user=user)
+    #     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     class Meta:
         model = Recipes
