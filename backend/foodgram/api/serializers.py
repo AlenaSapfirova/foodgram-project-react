@@ -286,16 +286,15 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Ошибка: нет тэгов в рецепте'
             )
-        
+        if type(tags) is not list:
+            raise serializers.ValidationError(
+                'перведано не верное значение. Хватит ковыряться в api!'
+            )
         for i in tags:
             if not Tag.objects.filter(id=i).exists():
                 raise serializers.ValidationError(
                     'такого тэга нет.'
                 )
-        if type(tags) is not list:
-            raise serializers.ValidationError(
-                'перведано не верное значение. Хватит ковыряться в api!'
-            )
         recipe.tags.set(tags)
         self.create_ingredients_amount(recipe=recipe,
                                        ingredients=ingredients)
