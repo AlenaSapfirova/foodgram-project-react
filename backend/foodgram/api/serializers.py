@@ -113,7 +113,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         if user == value:
             return ValueError('на себя подписываться нельзя')
         return value
-    
+
     def validate(self, data):
         user = self.context['request'].user
         if user.is_anonymous:
@@ -292,6 +292,10 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'такого тэга нет.'
                 )
+        if type(tags) is not list:
+            raise serializers.ValidationError(
+                'перведано не верное значение. Хватит ковыряться в api!'
+            )
         recipe.tags.set(tags)
         self.create_ingredients_amount(recipe=recipe,
                                        ingredients=ingredients)
