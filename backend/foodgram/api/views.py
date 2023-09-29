@@ -100,11 +100,16 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def list(self, request, queryset=queryset, *args, **kwargs):
         user = self.request.user
-        if user.is_anonymous and (
-            "is_favorited" in self.request
-            or 'is_in_shopping_cart' in self.request
-        ):
+        serializer = self.get_serializer(queryset, many=True)
+        if user.is_anonymous and (queryset == self.filter_queryset(
+            recipes_favorite_recipes__user=user
+        )
+            or queryset == self.filter_queryset(
+                recipes_shopping_cart_recipes__user=user
+        )):
+
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.data)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
