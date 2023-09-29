@@ -98,6 +98,12 @@ class RecipesViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPaginator
     permission_classes = [AuthorOrReadOnly, ]
 
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     queryset = Recipes.objects.all()
+    #     if user.is_authenticated:
+    #         queryset = queryset
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return GetRecipesSerializer
