@@ -98,19 +98,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPaginator
     permission_classes = [AuthorOrReadOnly, ]
 
-    def list(self, request, queryset=queryset, *args, **kwargs):
+    def list(self, request, queryset, *args, **kwargs):
         user = self.request.user
         queryset = Recipes.objects.all()
-        if "is_favorited" in self.request and user.is_authenticated:
-            queryset = self.filter_queryset(
-                recipes_favorite_recipes__user=user
-            )
-            return queryset
-        if 'is_in_shopping_cart' in self.request and user.is_authenticated:
-            queryset = self.filter_queryset(
-                recipes_shopping_cart_recipes__user=user
-            )
-            return queryset
         if user.is_anonymous and (
             "is_favorited" in self.request
             or 'is_in_shopping_cart' in self.request
