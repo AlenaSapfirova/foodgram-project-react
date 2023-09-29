@@ -102,10 +102,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
         user = self.request.user
         serializer = self.get_serializer(queryset, many=True)
         if user.is_anonymous and (queryset == self.filter_queryset(
-            recipes_favorite_recipes__user=user
-        )
+            "is_favorited")
             or queryset == self.filter_queryset(
-                recipes_shopping_cart_recipes__user=user
+                "is_in_shopping_cart"
         )):
 
             return Response(status=status.HTTP_401_UNAUTHORIZED)
