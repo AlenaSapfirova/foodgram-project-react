@@ -20,7 +20,7 @@ class CustomFilters(filters.FilterSet):
 
     # is_favorited = filters.BooleanFilter(field_name='is_favorited',
     #                                      method='get_is_favorited')
-    is_favorited = filters.ChoiceFilter(
+    is_favorited = filters.AllValuesMultipleFilter(
         choices=CHOICES_LIST,
         method='is_favorited_method'
     )
