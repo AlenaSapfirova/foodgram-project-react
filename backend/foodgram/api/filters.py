@@ -5,25 +5,42 @@ from rest_framework import status
 from recipes.models import Recipes, Tag
 
 
+CHOICES_LIST = (
+    ('0', 'False'),
+    ('1', 'True')
+)
+
+
 class CustomFilters(filters.FilterSet):
     tags = filters.ModelMultipleChoiceFilter(field_name='tags__slug',
                                              to_field_name='slug',
                                              queryset=Tag.objects.all())
     author = filters.NumberFilter(field_name='author')
-    is_favorited = filters.BooleanFilter(field_name='is_favorited',
-                                         method='get_is_favorited')
-    is_in_shopping_cart = filters.BooleanFilter(
-        field_name='is_in_shopping_cart',
-        method='get_is_in_shopping_cart'
+
+    # is_favorited = filters.BooleanFilter(field_name='is_favorited',
+    #                                      method='get_is_favorited')
+    is_favorited = filters.ChoiceFilter(
+        choices=CHOICES_LIST,
+        method='is_favorited_method'
     )
+    is_in_shopping_cart = filters.ChoiceFilter(
+        choices=CHOICES_LIST,
+        method='is_in_shopping_cart_method'
+    )
+    # is_in_shopping_cart = filters.BooleanFilter(
+    #     field_name='is_in_shopping_cart',
+    #     method='get_is_in_shopping_cart'
+    # )
 
     def get_is_favorited(self, queryset, name, value):
         user = self.request.user
-        if (user.is_authenticated and value is True
-           and name == 'is_favorited'):
-            return queryset.filter(recipes_favorite_recipes__user=user)
-        if not value and user.is_anonymous:
+        if user.is_anonymous:
             return self.queryset.none()
+        # if (user.is_authenticated and value is True
+        #    and name == 'is_favorited'):
+        return queryset.filter(recipes_favorite_recipes__user=user)
+        # if not value and user.is_anonymous:
+        #     return self.queryset.none()
         # return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def get_is_in_shopping_cart(self, queryset, name, value):
