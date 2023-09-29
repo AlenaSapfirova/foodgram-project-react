@@ -20,14 +20,7 @@ class CustomFilters(filters.FilterSet):
     is_favorited = filters.BooleanFilter(field_name='is_favorited',
                                          method='get_is_favorited',
                                          exclude=True, lookup_expr=True)
-    # is_favorited = filters.AllValuesMultipleFilter(
-    #     choices=CHOICES_LIST,
-    #     method='is_favorited_method'
-    # )
-    # is_in_shopping_cart = filters.ChoiceFilter(
-    #     choices=CHOICES_LIST,
-    #     method='is_in_shopping_cart_method'
-    # )
+   
     is_in_shopping_cart = filters.BooleanFilter(
         field_name='is_in_shopping_cart',
         method='get_is_in_shopping_cart'

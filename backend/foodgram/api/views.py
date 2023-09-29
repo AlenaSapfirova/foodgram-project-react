@@ -98,11 +98,25 @@ class RecipesViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPaginator
     permission_classes = [AuthorOrReadOnly, ]
 
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     queryset = Recipes.objects.all()
-    #     if user.is_authenticated:
-    #         queryset = queryset
+    def list(self, request, queryset=queryset, *args, **kwargs):
+        user = self.request.user
+        queryset = Recipes.objects.all()
+        if "is_favorited" in self.request and user.is_authenticated:
+            queryset = self.filter_queryset(
+                recipes_favorite_recipes__user=user
+            )
+            return queryset
+        if 'is_in_shopping_cart' in self.request and user.is_authenticated:
+            queryset = self.filter_queryset(
+                recipes_shopping_cart_recipes__user=user
+            )
+            return queryset
+        if user.is_anonymous and (
+            "is_favorited" in self.request
+            or 'is_in_shopping_cart' in self.request
+        ):
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
