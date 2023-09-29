@@ -99,14 +99,16 @@ class RecipesViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorOrReadOnly, ]
 
     def list(self, request, queryset=queryset, *args, **kwargs):
-        user = request.user.id
+        user = self.context['request'].user.id
         serializer = self.get_serializer(queryset, many=True)
-        if user is None and (queryset == queryset.filter(
-            recipes_favorite_recipes__user=user
-        )
+        if self.context['request'].user.id is None and (
+            queryset == queryset.filter(
+                recipes_favorite_recipes__user=user
+            )
             or queryset == queryset.filter(
-            recipes_shopping_cart_recipes__user=user
-        )):
+                recipes_shopping_cart_recipes__user=user
+            )
+        ):
   
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         page = self.paginate_queryset(queryset)
