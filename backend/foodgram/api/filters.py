@@ -1,8 +1,9 @@
 from django_filters import rest_framework as filters
+from distutils.util import strtobool
 from rest_framework.response import Response
 from rest_framework import status
 
-from recipes.models import Recipes, Tag
+from recipes.models import Recipes, Tag, Favorite
 
 
 CHOICES_LIST = (
@@ -19,7 +20,7 @@ class CustomFilters(filters.FilterSet):
 
     # is_favorited = filters.BooleanFilter(field_name='is_favorited',
     #                                      method='get_is_favorited')
-    is_favorited = filters.AllValuesMultipleFilter(
+    is_favorited = filters.ChoiceFilter(
         choices=CHOICES_LIST,
         method='is_favorited_method'
     )
@@ -36,9 +37,17 @@ class CustomFilters(filters.FilterSet):
         user = self.request.user
         if user.is_anonymous:
             return self.queryset.none()
+        favorites = Favorite.objects.filter(user=self.request.user)
+        recipes = [item.recipe.id for item in favorites]
+        new_queryset = queryset.filter(id__in=recipes)
+
+        if not strtobool(value):
+            return queryset.difference(new_queryset)
+
+        return queryset.filter(id__in=recipes)
         # if (user.is_authenticated and value is True
         #    and name == 'is_favorited'):
-        return queryset.filter(recipes_favorite_recipes__user=user)
+        # return queryset.filter(recipes_favorite_recipes__user=user)
         # if not value and user.is_anonymous:
         #     return self.queryset.none()
         # return Response(status=status.HTTP_401_UNAUTHORIZED)
