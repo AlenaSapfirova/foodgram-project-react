@@ -99,9 +99,9 @@ class RecipesViewSet(viewsets.ModelViewSet):
     permission_classes = [AuthorOrReadOnly, ]
 
     def list(self, request, queryset=queryset, *args, **kwargs):
-        user = self.context['request'].user.id
+        user = self.request.user.id
         serializer = self.get_serializer(queryset, many=True)
-        if self.context['request'].user.id is None and (
+        if user is None and (
             queryset == queryset.filter(
                 recipes_favorite_recipes__user=user
             )
