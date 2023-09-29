@@ -1,10 +1,9 @@
 from django_filters import rest_framework as filters
-from distutils.util import strtobool
+# from distutils.util import strtobool
 from rest_framework.response import Response
 from rest_framework import status
 
-from recipes.models import Recipes, Tag, Favorite
-
+from recipes.models import Recipes, Tag
 
 CHOICES_LIST = (
     ('0', 'False'),
