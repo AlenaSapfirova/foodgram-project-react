@@ -105,7 +105,6 @@ class RecipesViewSet(viewsets.ModelViewSet):
             or 'is_in_shopping_cart' in self.request
         ):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        return queryset
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
