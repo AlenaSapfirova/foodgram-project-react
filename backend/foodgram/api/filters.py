@@ -18,12 +18,13 @@ class CustomFilters(filters.FilterSet):
                                              queryset=Tag.objects.all())
     author = filters.NumberFilter(field_name='author')
 
-    # is_favorited = filters.BooleanFilter(field_name='is_favorited',
-    #                                      method='get_is_favorited')
-    is_favorited = filters.AllValuesMultipleFilter(
-        choices=CHOICES_LIST,
-        method='is_favorited_method'
-    )
+    is_favorited = filters.BooleanFilter(field_name='is_favorited',
+                                         method='get_is_favorited',
+                                         exclude=True)
+    # is_favorited = filters.AllValuesMultipleFilter(
+    #     choices=CHOICES_LIST,
+    #     method='is_favorited_method'
+    # )
     is_in_shopping_cart = filters.ChoiceFilter(
         choices=CHOICES_LIST,
         method='is_in_shopping_cart_method'
@@ -35,21 +36,21 @@ class CustomFilters(filters.FilterSet):
 
     def get_is_favorited(self, queryset, name, value):
         user = self.request.user
-        if user.is_anonymous:
-            return self.queryset.none()
-        favorites = Favorite.objects.filter(user=self.request.user)
-        recipes = [item.recipe.id for item in favorites]
-        new_queryset = queryset.filter(id__in=recipes)
-
-        if not strtobool(value):
-            return queryset.difference(new_queryset)
-
-        return queryset.filter(id__in=recipes)
-        # if (user.is_authenticated and value is True
-        #    and name == 'is_favorited'):
-        # return queryset.filter(recipes_favorite_recipes__user=user)
-        # if not value and user.is_anonymous:
+        # if user.is_anonymous:
         #     return self.queryset.none()
+        # favorites = Favorite.objects.filter(user=self.request.user)
+        # recipes = [item.recipe.id for item in favorites]
+        # new_queryset = queryset.filter(id__in=recipes)
+
+        # if not strtobool(value):
+        #     return queryset.difference(new_queryset)
+
+        # return queryset.filter(id__in=recipes)
+        if (user.is_authenticated and value is True
+           and name == 'is_favorited'):
+            return queryset.filter(recipes_favorite_recipes__user=user)
+        if not value and user.is_anonymous:
+            return self.queryset.none()
         # return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def get_is_in_shopping_cart(self, queryset, name, value):
