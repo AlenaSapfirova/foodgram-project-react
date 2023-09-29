@@ -107,8 +107,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
             or queryset == queryset.filter(
             recipes_shopping_cart_recipes__user=user
         )):
-
+  
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(page, many=True)
         return Response(serializer.data)
 
     def get_serializer_class(self):
