@@ -101,7 +101,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
     def list(self, request, queryset=queryset, *args, **kwargs):
         user = self.request.user
         serializer = self.get_serializer(queryset, many=True)
-        if user.is_anonymous and (queryset == queryset.filter(
+        if user.id is None and (queryset == queryset.filter(
             recipes_favorite_recipes__user=user
         )
             or queryset == queryset.filter(
