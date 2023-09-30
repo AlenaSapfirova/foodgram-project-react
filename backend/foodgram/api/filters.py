@@ -1,7 +1,7 @@
 from django_filters import rest_framework as filters
 # from distutils.util import strtobool
 # from rest_framework.response import Response
-# from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed
 
 from recipes.models import Recipes, Tag
 
@@ -29,9 +29,13 @@ class CustomFilters(filters.FilterSet):
     def get_is_favorited(self, queryset, name, value):
         queryset = Recipes.objects.all()
         user = self.request.user
+        if user.is_anonymous:
+            raise AuthenticationFailed(
+                'Вы неавторизованы. Авторизуйтесь'
+            )
         if user.is_authenticated and name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
-        return queryset.none()
+        # return queryset.none()
         # return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def get_is_in_shopping_cart(self, queryset, name, value):
