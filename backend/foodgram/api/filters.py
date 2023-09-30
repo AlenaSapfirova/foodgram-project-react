@@ -5,11 +5,6 @@ from django_filters import rest_framework as filters
 
 from recipes.models import Recipes, Tag
 
-CHOICES_LIST = (
-    ('0', 'False'),
-    ('1', 'True')
-)
-
 
 class CustomFilters(filters.FilterSet):
     tags = filters.ModelMultipleChoiceFilter(field_name='tags__slug',
@@ -27,9 +22,9 @@ class CustomFilters(filters.FilterSet):
     )
 
     def get_is_favorited(self, queryset, name, value):
-        # queryset = Recipes.objects.all()
         user = self.request.user
         if user.is_authenticated and name == 'is_favorited':
+            print('favorited')
             # if user.is_authenticated and name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
         return queryset
@@ -38,8 +33,9 @@ class CustomFilters(filters.FilterSet):
     def get_is_in_shopping_cart(self, queryset, name, value):
         user = self.request.user
         if user.is_authenticated and name == 'is_in_shopping_cart':
+            print('shopping_cart')
             return queryset.filter(recipes_shopping_cart_recipes__user=user)
-        return []
+        return queryset
         # return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     class Meta:
