@@ -33,7 +33,8 @@ class CustomFilters(filters.FilterSet):
             raise AuthenticationFailed(
                 'Вы неавторизованы. Авторизуйтесь'
             )
-        if user.is_authenticated and name == 'is_favorited':
+        if value:
+            # if user.is_authenticated and name == 'is_favorited':
             return queryset.filter(recipes_favorite_recipes__user=user)
         return queryset
         # return Response(status=status.HTTP_401_UNAUTHORIZED)
