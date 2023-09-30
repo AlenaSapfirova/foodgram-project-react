@@ -103,11 +103,16 @@ class RecipesViewSet(viewsets.ModelViewSet):
         # serializer = self.get_serializer(queryset, many=True)
         if CustomFilters and user.is_anonymous:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
-        # page = self.paginate_queryset(queryset)
-        # if page is not None:
-        #     serializer = self.get_serializer(page, many=True)
-        #     return self.get_paginated_response(serializer.data)
+        if CustomFilters.get_is_favorited:
+            queryset = queryset.filter(recipes_favorite_recipes__user=user)
+        if CustomFilters.get_is_in_shopping_cart:
+            queryset = queryset.filter(
+                recipes_shopping_cart_recipes__user=user
+            )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
     # serializer = self.get_serializer(page, many=True)
     # return Response(serializer.data)
