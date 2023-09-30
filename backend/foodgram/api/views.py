@@ -100,13 +100,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def list(self, request, queryset=queryset, *args, **kwargs):
         user = self.request.user
-        serializer = self.get_serializer(queryset, many=True)
+        # serializer = self.get_serializer(queryset, many=True)
         if CustomFilters and user.is_anonymous:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        
+        # page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
 
     # serializer = self.get_serializer(page, many=True)
     # return Response(serializer.data)
