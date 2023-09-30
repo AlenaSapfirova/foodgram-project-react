@@ -98,26 +98,29 @@ class RecipesViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPaginator
     permission_classes = [AuthorOrReadOnly, ]
 
-    def list(self, request, queryset=queryset, *args, **kwargs):
-        user = self.request.user
-        serializer = self.get_serializer(queryset, many=True)
-        if not user.is_authenticated and (
-            queryset == queryset.filter(
-                recipes_favorite_recipes__user=user
-            )
-            or queryset == queryset.filter(
-                recipes_shopping_cart_recipes__user=user
-            )
-        ):
-  
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+    # def list(self, request, queryset=queryset, *args, **kwargs):
+    #     user = self.request.user
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     if CustomFilters:
+    #         return queryset
 
-        serializer = self.get_serializer(page, many=True)
-        return Response(serializer.data)
+    # if user.is_authenticated and (
+    #     queryset == queryset.filter(
+    #         recipes_favorite_recipes__user=user
+    #     )
+    #     or queryset == queryset.filter(
+    #         recipes_shopping_cart_recipes__user=user
+    #     )
+    # ):
+  
+    #     return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # page = self.paginate_queryset(queryset)
+    # if page is not None:
+    #     serializer = self.get_serializer(page, many=True)
+    #     return self.get_paginated_response(serializer.data)
+
+    # serializer = self.get_serializer(page, many=True)
+    # return Response(serializer.data)
     # def get_queryset(self):
     #     user = self.request.user
     #     queryset = Recipes.objects.all()
