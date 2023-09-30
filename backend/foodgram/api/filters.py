@@ -27,9 +27,9 @@ class CustomFilters(filters.FilterSet):
     )
 
     def get_is_favorited(self, queryset, name, value):
-        queryset = Recipes.objects.all()
+        # queryset = Recipes.objects.all()
         user = self.request.user
-        if user.is_anonymous:
+        if not user.is_authenticated:
             raise AuthenticationFailed(
                 'Вы неавторизованы. Авторизуйтесь'
             )
