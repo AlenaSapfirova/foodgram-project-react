@@ -118,16 +118,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(page, many=True)
         return Response(serializer.data)
-    def get_queryset(self):
-        user = self.request.user
-        queryset = Recipes.objects.all()
-        if queryset == queryset.filter(
-            recipes_favorite_recipes__user=user
-        ) or queryset == queryset.filter(
-            recipes_shopping_cart_recipes__user=user
-        ):
-            
-    
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     queryset = Recipes.objects.all()
+    #     if queryset == queryset.filter(
+    #         recipes_favorite_recipes__user=user
+    #     ) or queryset == queryset.filter(
+    #         recipes_shopping_cart_recipes__user=user
+    #     ):
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
