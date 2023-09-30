@@ -109,6 +109,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(
                 recipes_shopping_cart_recipes__user=user
             )
+        else:
+            queryset = Recipes.objects.all()
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
