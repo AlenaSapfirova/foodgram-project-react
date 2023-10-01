@@ -125,6 +125,12 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
+    color = serializers.CharField(max_length=7,
+                                  validators=[
+                                      UniqueValidator(
+                                          queryset=Tag.objects.all()
+                                      )
+                                  ])
 
     class Meta:
         model = Tag
