@@ -148,8 +148,8 @@ class FavoriteBase(models.Model):
 class Shopping_Cart(FavoriteBase):
     class Meta:
         db_table = 'Shopping_Cart'
-        verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
+        verbose_name = 'Список покупок'
         constraints = [
             models.UniqueConstraint(fields=['user', 'recipes'],
                                     name='unique_user_shopping_cart_recipes')
@@ -159,8 +159,8 @@ class Shopping_Cart(FavoriteBase):
 class Favorite(FavoriteBase):
     class Meta:
         db_table = 'Favorite'
-        verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        verbose_name = 'Избранное'
         constraints = [
             models.UniqueConstraint(fields=['user', 'recipes'],
                                     name='unique_user_favorite_recipes')
