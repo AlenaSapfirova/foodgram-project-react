@@ -272,7 +272,7 @@ class CreateUpdateRecipesSerializer(serializers.ModelSerializer):
                                         amount=amount,
                                         recipe=recipe)
         return new
-    
+
     @transaction.atomic
     def create(self, validated_data):
         tags = self.initial_data.get('tags')

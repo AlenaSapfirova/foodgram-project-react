@@ -13,7 +13,7 @@ class CustomFilters(filters.FilterSet):
     is_favorited = filters.BooleanFilter(field_name='is_favorited',
                                          method='get_is_favorited',
                                          exclude=True, lookup_expr=True)
-   
+
     is_in_shopping_cart = filters.BooleanFilter(
         field_name='is_in_shopping_cart',
         method='get_is_in_shopping_cart'
