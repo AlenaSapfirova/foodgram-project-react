@@ -146,6 +146,7 @@ class FavoriteBase(models.Model):
 
 
 class Shopping_Cart(FavoriteBase):
+
     class Meta:
         db_table = 'Shopping_Cart'
         verbose_name_plural = 'Список покупок'
@@ -157,6 +158,7 @@ class Shopping_Cart(FavoriteBase):
 
 
 class Favorite(FavoriteBase):
+
     class Meta:
         db_table = 'Favorite'
         verbose_name_plural = 'Избранное'
