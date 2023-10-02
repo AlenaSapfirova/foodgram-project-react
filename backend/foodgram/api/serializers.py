@@ -138,7 +138,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def validate_color(self, value):
-        if value in Tag.objects.all():
+        if Tag.objects.filter(color=value).exists():
             serializers.ValidationError(
                 'у тегов не может быть одинаковых цветов'
             )
