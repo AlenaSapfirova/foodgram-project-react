@@ -141,7 +141,7 @@ class TagSerializer(serializers.ModelSerializer):
             serializers.ValidationError(
                 'у тегов не может быть одинаковых цветов'
             )
-        return value  
+        return value
 
 
 class AmountSerializer(serializers.ModelSerializer):
