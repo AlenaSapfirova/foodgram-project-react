@@ -136,6 +136,13 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'color', 'slug', "name")
 
+    def validate_color(self, value):
+        if value in Tag.objects.all():
+            serializers.ValidationError(
+                'у тегов не может быть одинаковых цветов'
+            )
+        return value  
+
 
 class AmountSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(source='ingredient.id',
