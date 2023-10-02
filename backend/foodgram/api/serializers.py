@@ -136,6 +136,7 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'color', 'slug', "name")
 
+    @transaction.atomic
     def validate_color(self, value):
         if value in Tag.objects.all():
             serializers.ValidationError(
