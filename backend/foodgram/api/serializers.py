@@ -136,13 +136,13 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('id', 'color', 'slug', "name")
 
-    @transaction.atomic
-    def validate_color(self, value):
-        if Tag.objects.filter(color=value).exists():
-            serializers.ValidationError(
-                'у тегов не может быть одинаковых цветов'
-            )
-        return value
+    # @transaction.atomic
+    # def validate_color(self, value):
+    #     if Tag.objects.filter(color=value).exists():
+    #         serializers.ValidationError(
+    #             'у тегов не может быть одинаковых цветов'
+    #         )
+    #     return value
 
 
 class AmountSerializer(serializers.ModelSerializer):
